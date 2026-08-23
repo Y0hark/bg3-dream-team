@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/sceau.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BG3 Honor Run Tracker</title>
+    <meta
+      name="description"
+      content="Suivi de run Honneur Baldur's Gate 3 : 4 builds, leveling, loadouts, items par acte et lieux de récupération."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      // Thème posé avant le premier rendu : évite le flash de palette.
+      // La liste doit rester alignée sur src/lib/themes.js.
+      ;(function () {
+        var themes = ['grimoire', 'flagelleur', 'avernus', 'parchemin']
+        var choisi
+        try {
+          choisi = localStorage.getItem('bg3-theme')
+        } catch (e) {
+          choisi = null
+        }
+        document.documentElement.dataset.theme =
+          themes.indexOf(choisi) === -1 ? 'grimoire' : choisi
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

@@ -1,0 +1,591 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------
+   BG3 Honor Run Tracker — feuille de style « grimoire »
+   Fond d'encre, dorures gravées, texture de parchemin brûlé. Dans la
+   continuité visuelle du Solasta Build Planner.
+   ------------------------------------------------------------------ */
+
+/* ==================================================================
+   THÈMES
+   Chaque thème redéfinit les mêmes variables ; les composants ne
+   connaissent que les noms Tailwind (or-300, gray-400, slate-750…).
+   Règle de lecture : 100 = teinte la plus contrastée avec le fond,
+   700 = la plus discrète. En thème clair l'échelle s'inverse donc
+   physiquement (100 devient foncé) mais garde le même rôle.
+   Le thème est posé sur <html data-theme="…"> (cf. src/hooks/useTheme.js).
+   ================================================================== */
+
+/* --- 1. Grimoire — encre noire et dorures (thème d'origine) -------- */
+:root,
+[data-theme='grimoire'] {
+  color-scheme: dark;
+
+  --c-encre: 7 7 11;
+  --c-obsidienne: 15 17 23;
+  --c-voile: 255 255 255;
+
+  --c-or-100: 246 231 180;
+  --c-or-300: 232 198 106;
+  --c-or-500: 201 162 39;
+  --c-or-700: 138 109 24;
+  --c-braise: 139 58 31;
+
+  --c-gray-100: 243 244 246;
+  --c-gray-200: 229 231 235;
+  --c-gray-300: 209 213 219;
+  --c-gray-400: 156 163 175;
+  --c-gray-500: 107 114 128;
+  --c-gray-600: 75 85 99;
+
+  --c-slate-300: 203 213 225;
+  --c-slate-700: 51 65 85;
+  --c-slate-750: 41 53 72;
+  --c-slate-800: 30 41 59;
+
+  --c-red-200: 254 202 202;
+  --c-red-300: 252 165 165;
+  --c-red-400: 248 113 113;
+  --c-red-500: 239 68 68;
+  --c-amber-100: 254 243 199;
+  --c-amber-200: 253 230 138;
+  --c-amber-300: 252 211 77;
+  --c-amber-400: 251 191 36;
+  --c-purple-200: 233 213 255;
+  --c-purple-300: 216 180 254;
+  --c-purple-400: 192 132 252;
+  --c-purple-500: 168 85 247;
+  --c-emerald-200: 167 243 208;
+  --c-emerald-300: 110 231 183;
+  --c-emerald-400: 52 211 153;
+  --c-emerald-500: 16 185 129;
+  --c-sky-200: 186 230 253;
+  --c-sky-300: 125 211 252;
+  --c-sky-400: 56 189 248;
+  --c-sky-500: 14 165 233;
+
+  /* Halos de bougie posés sur le fond */
+  --halo-a: 201 162 39;
+  --halo-b: 139 58 31;
+  --halo-c: 88 28 135;
+  --halo-force: 0.12;
+
+  /* Grain de parchemin */
+  --grain-opacite: 0.28;
+  --grain-fusion: overlay;
+
+  /* Ombres et reflets des plaques */
+  --ombre-portee: 0 18px 40px -18px rgba(0, 0, 0, 0.9);
+  --ombre-plaque: 0 18px 40px -20px rgba(0, 0, 0, 0.95);
+  --ombre-plaque-vive: 0 26px 55px -26px rgba(0, 0, 0, 0.95);
+  --lustre-plaque: 255 255 255;
+  --lustre-force: 0.04;
+
+  /* Dégradé des titres gravés */
+  --grave-haut: 246 231 180;
+  --grave-milieu: 232 198 106;
+  --grave-bas: 163 124 28;
+
+  /* Respiration lumineuse du titre : les thèmes clairs l'atténuent, une
+     auréole dorée autour d'un texte foncé se lisant mal. */
+  --lueur-faible: 0.15;
+  --lueur-forte: 0.45;
+
+  /* Ombre portée des lettres gravées. Les thèmes clairs la suppriment :
+     un liseré clair sous un texte foncé délave les pleins et déliés. */
+  --ombre-grave: 0 1px 0 rgba(0, 0, 0, 0.55);
+}
+
+/* --- 2. Flagelleur — nautiloïde, améthyste et néon cérébral -------- */
+[data-theme='flagelleur'] {
+  color-scheme: dark;
+
+  --c-encre: 8 7 16;
+  --c-obsidienne: 18 16 32;
+  --c-voile: 255 255 255;
+
+  --c-or-100: 235 228 255;
+  --c-or-300: 197 176 250;
+  --c-or-500: 149 118 228;
+  --c-or-700: 90 68 146;
+  --c-braise: 58 96 126;
+
+  --c-gray-100: 241 240 250;
+  --c-gray-200: 226 224 242;
+  --c-gray-300: 201 198 224;
+  --c-gray-400: 151 148 180;
+  --c-gray-500: 111 108 140;
+  --c-gray-600: 79 76 104;
+
+  --c-slate-300: 191 187 216;
+  --c-slate-700: 46 42 74;
+  --c-slate-750: 35 32 59;
+  --c-slate-800: 27 24 46;
+
+  --c-red-200: 253 200 214;
+  --c-red-300: 250 160 182;
+  --c-red-400: 244 114 145;
+  --c-red-500: 232 70 110;
+  --c-amber-100: 250 240 214;
+  --c-amber-200: 246 224 172;
+  --c-amber-300: 240 204 124;
+  --c-amber-400: 232 186 92;
+  --c-purple-200: 231 214 255;
+  --c-purple-300: 210 182 255;
+  --c-purple-400: 184 138 252;
+  --c-purple-500: 158 92 245;
+  --c-emerald-200: 178 244 224;
+  --c-emerald-300: 134 232 206;
+  --c-emerald-400: 76 214 182;
+  --c-emerald-500: 40 190 158;
+  --c-sky-200: 186 222 255;
+  --c-sky-300: 146 200 252;
+  --c-sky-400: 104 178 250;
+  --c-sky-500: 70 152 236;
+
+  --halo-a: 124 92 224;
+  --halo-b: 40 120 150;
+  --halo-c: 168 74 196;
+  --halo-force: 0.16;
+
+  --grain-opacite: 0.24;
+  --grain-fusion: overlay;
+
+  --ombre-portee: 0 18px 40px -18px rgba(0, 0, 0, 0.9);
+  --ombre-plaque: 0 18px 40px -20px rgba(4, 2, 14, 0.95);
+  --ombre-plaque-vive: 0 26px 55px -26px rgba(4, 2, 14, 0.95);
+  --lustre-plaque: 200 180 255;
+  --lustre-force: 0.05;
+
+  --grave-haut: 240 233 255;
+  --grave-milieu: 197 176 250;
+  --grave-bas: 122 92 192;
+}
+
+/* --- 3. Avernus — charbon chaud, cuivre et braise infernale -------- */
+[data-theme='avernus'] {
+  color-scheme: dark;
+
+  --c-encre: 14 10 8;
+  --c-obsidienne: 27 19 15;
+  --c-voile: 255 240 230;
+
+  --c-or-100: 250 220 195;
+  --c-or-300: 233 166 116;
+  --c-or-500: 197 116 57;
+  --c-or-700: 130 71 31;
+  --c-braise: 168 62 28;
+
+  --c-gray-100: 249 243 237;
+  --c-gray-200: 237 227 218;
+  --c-gray-300: 216 202 189;
+  --c-gray-400: 165 149 136;
+  --c-gray-500: 121 107 97;
+  --c-gray-600: 88 76 67;
+
+  --c-slate-300: 214 196 184;
+  --c-slate-700: 63 45 37;
+  --c-slate-750: 50 35 29;
+  --c-slate-800: 39 27 22;
+
+  --c-red-200: 253 197 182;
+  --c-red-300: 250 160 138;
+  --c-red-400: 242 112 84;
+  --c-red-500: 226 74 44;
+  --c-amber-100: 253 236 205;
+  --c-amber-200: 250 218 158;
+  --c-amber-300: 246 194 104;
+  --c-amber-400: 240 172 62;
+  --c-purple-200: 232 205 244;
+  --c-purple-300: 214 172 236;
+  --c-purple-400: 188 128 222;
+  --c-purple-500: 162 88 202;
+  --c-emerald-200: 186 226 198;
+  --c-emerald-300: 150 216 168;
+  --c-emerald-400: 104 194 128;
+  --c-emerald-500: 74 170 100;
+  --c-sky-200: 190 222 238;
+  --c-sky-300: 150 202 226;
+  --c-sky-400: 110 178 214;
+  --c-sky-500: 78 152 192;
+
+  --halo-a: 214 126 48;
+  --halo-b: 186 52 24;
+  --halo-c: 122 66 20;
+  --halo-force: 0.16;
+
+  --grain-opacite: 0.3;
+  --grain-fusion: overlay;
+
+  --ombre-portee: 0 18px 40px -18px rgba(0, 0, 0, 0.9);
+  --ombre-plaque: 0 18px 40px -20px rgba(10, 4, 0, 0.95);
+  --ombre-plaque-vive: 0 26px 55px -26px rgba(10, 4, 0, 0.95);
+  --lustre-plaque: 255 214 176;
+  --lustre-force: 0.05;
+
+  --grave-haut: 255 226 198;
+  --grave-milieu: 233 166 116;
+  --grave-bas: 161 84 31;
+}
+
+/* --- 4. Parchemin — vélin, encre brune et bronze (clair) ----------- */
+[data-theme='parchemin'] {
+  color-scheme: light;
+
+  --c-encre: 237 227 203;
+  --c-obsidienne: 253 248 237;
+  --c-voile: 62 44 22;
+
+  --c-or-100: 74 52 10;
+  --c-or-300: 118 84 20;
+  --c-or-500: 158 120 42;
+  --c-or-700: 190 162 100;
+  --c-braise: 150 60 30;
+
+  --c-gray-100: 33 25 17;
+  --c-gray-200: 46 35 25;
+  --c-gray-300: 68 54 40;
+  --c-gray-400: 110 92 71;
+  --c-gray-500: 145 125 100;
+  --c-gray-600: 182 160 126;
+
+  --c-slate-300: 124 106 84;
+  --c-slate-700: 234 223 196;
+  --c-slate-750: 245 237 217;
+  --c-slate-800: 252 247 234;
+
+  --c-red-200: 138 32 32;
+  --c-red-300: 162 42 38;
+  --c-red-400: 190 62 50;
+  --c-red-500: 176 48 38;
+  --c-amber-100: 108 72 12;
+  --c-amber-200: 131 90 18;
+  --c-amber-300: 172 122 32;
+  --c-amber-400: 192 143 44;
+  --c-purple-200: 90 44 138;
+  --c-purple-300: 110 58 162;
+  --c-purple-400: 134 82 192;
+  --c-purple-500: 118 58 186;
+  --c-emerald-200: 12 88 64;
+  --c-emerald-300: 16 102 74;
+  --c-emerald-400: 22 128 90;
+  --c-emerald-500: 20 116 82;
+  --c-sky-200: 22 82 122;
+  --c-sky-300: 26 96 140;
+  --c-sky-400: 30 108 158;
+  --c-sky-500: 28 100 146;
+
+  --halo-a: 196 154 60;
+  --halo-b: 178 106 52;
+  --halo-c: 150 128 96;
+  --halo-force: 0.18;
+
+  --grain-opacite: 0.2;
+  --grain-fusion: multiply;
+
+  --ombre-portee: 0 14px 30px -18px rgba(78, 56, 24, 0.55);
+  --ombre-plaque: 0 12px 28px -18px rgba(78, 56, 24, 0.45);
+  --ombre-plaque-vive: 0 20px 40px -22px rgba(78, 56, 24, 0.55);
+  --lustre-plaque: 255 255 255;
+  --lustre-force: 0.5;
+
+  /* Thème clair : le dégradé s'assombrit vers le bas — sur du vélin, c'est
+     l'ombre qui creuse la lettre, pas la lumière. */
+  --grave-haut: 150 118 48;
+  --grave-milieu: 108 79 19;
+  --grave-bas: 66 45 8;
+
+  --lueur-faible: 0.04;
+  --lueur-forte: 0.12;
+  --ombre-grave: none;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-encre font-grimoire text-gray-200 antialiased;
+    /* Trois halos de bougie posés sur le fond */
+    background-image:
+      radial-gradient(
+        60rem 40rem at 12% -10%,
+        rgb(var(--halo-a) / var(--halo-force)),
+        transparent 60%
+      ),
+      radial-gradient(
+        50rem 40rem at 100% 0%,
+        rgb(var(--halo-b) / var(--halo-force)),
+        transparent 60%
+      ),
+      radial-gradient(
+        70rem 50rem at 50% 120%,
+        rgb(var(--halo-c) / var(--halo-force)),
+        transparent 65%
+      );
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  /* Grain de parchemin appliqué sur toute la page, sans intercepter les clics */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+    opacity: var(--grain-opacite);
+    mix-blend-mode: var(--grain-fusion);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23g)' opacity='0.5'/%3E%3C/svg%3E");
+  }
+
+  ::selection {
+    @apply bg-or-500/35 text-or-100;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-or-300 ring-offset-2 ring-offset-encre;
+  }
+
+  /* Une reliure fine plutôt que la barre système */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-encre;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full border-2 border-encre bg-or-500/50;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-or-500/80;
+  }
+}
+
+@layer components {
+  /* Titre gravé : la dorure prend la lumière du haut */
+  .grave {
+    @apply font-display uppercase;
+    background-image: linear-gradient(
+      180deg,
+      rgb(var(--grave-haut)) 0%,
+      rgb(var(--grave-milieu)) 42%,
+      rgb(var(--grave-bas)) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: var(--ombre-grave);
+  }
+
+  /* Filet doré séparateur, atténué aux extrémités */
+  .filet {
+    height: 1px;
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgb(var(--c-or-500) / 0.55) 20%,
+      rgb(var(--c-or-100) / 0.85) 50%,
+      rgb(var(--c-or-500) / 0.55) 80%,
+      transparent
+    );
+  }
+
+  /* Surface de carte : ardoise patinée + liseré d'or discret */
+  .plaque {
+    @apply relative rounded-sm border border-or-700/30 bg-slate-800/70 backdrop-blur-sm;
+    background-image: linear-gradient(
+      160deg,
+      rgb(var(--lustre-plaque) / var(--lustre-force)),
+      transparent 45%
+    );
+    box-shadow: var(--ombre-plaque);
+  }
+
+  /* Équerres dorées aux angles — se déploient au survol de la carte */
+  .equerres::before,
+  .equerres::after {
+    content: '';
+    position: absolute;
+    width: 1.15rem;
+    height: 1.15rem;
+    border-color: rgb(var(--c-or-300) / 0.75);
+    transition:
+      width 0.35s ease,
+      height 0.35s ease,
+      border-color 0.35s ease;
+    pointer-events: none;
+  }
+  .equerres::before {
+    top: 0;
+    left: 0;
+    border-top-width: 2px;
+    border-left-width: 2px;
+  }
+  .equerres::after {
+    bottom: 0;
+    right: 0;
+    border-bottom-width: 2px;
+    border-right-width: 2px;
+  }
+  .groupe-plaque:hover .equerres::before,
+  .groupe-plaque:hover .equerres::after,
+  .groupe-plaque:focus-within .equerres::before,
+  .groupe-plaque:focus-within .equerres::after {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-color: rgb(var(--c-or-100));
+  }
+
+  /* Petite étiquette de données, façon note de marge */
+  .glyphe {
+    @apply font-rune text-[0.65rem] uppercase tracking-[0.22em] text-or-500/80;
+  }
+
+  /* Champ de saisie / select des filtres */
+  .champ {
+    @apply w-full rounded-sm border border-or-700/35 bg-encre/60 px-3 py-2 font-rune text-xs uppercase tracking-[0.12em] text-gray-200 transition-colors;
+  }
+  .champ:hover {
+    @apply border-or-500/60;
+  }
+
+  /* Bouton discret, liseré d'or */
+  .bouton {
+    @apply rounded-sm border border-or-700/40 px-3 py-1.5 font-rune text-[0.65rem] uppercase tracking-[0.18em] text-or-300 transition-colors duration-300;
+  }
+  .bouton:hover {
+    @apply border-or-300 text-or-100;
+  }
+
+  /* Gouttière de progression : la barre pleine porte l'accent */
+  .gouttiere {
+    @apply h-1.5 w-full overflow-hidden rounded-full bg-voile/[0.08];
+  }
+  .gouttiere > span {
+    @apply block h-full rounded-full transition-[width] duration-700 ease-out;
+  }
+
+  /* ----------------------------------------------------------------
+     Lueur d'accent — les éléments concernés portent --accent (cf.
+     variableAccent() dans src/lib/accents.js). Sans la variable, la
+     valeur de repli garde l'or du grimoire.
+     ---------------------------------------------------------------- */
+  .accent-vif {
+    transition:
+      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      box-shadow 0.45s ease,
+      border-color 0.35s ease;
+  }
+  .groupe-plaque:hover .accent-vif,
+  .groupe-plaque:focus-within .accent-vif {
+    transform: scale(1.03);
+    border-color: rgb(var(--accent, var(--c-or-300)) / 0.6);
+    box-shadow:
+      0 0 0 1px rgb(var(--accent, var(--c-or-300)) / 0.35),
+      0 0 34px -6px rgb(var(--accent, var(--c-or-300)) / 0.4),
+      var(--ombre-plaque-vive);
+  }
+  /* L'icône du sceau bascule légèrement quand la carte s'anime */
+  .sceau-carte {
+    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .groupe-plaque:hover .sceau-carte,
+  .groupe-plaque:focus-within .sceau-carte {
+    transform: rotate(8deg) scale(1.12);
+  }
+
+  /* Priorité S+ : le sceau respire, c'est un item à ne pas rater */
+  .sceau-critique {
+    animation: pulsationSceau 2.6s ease-in-out infinite;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Keyframes maison (hors config Tailwind : elles dépendent de --accent)
+   ------------------------------------------------------------------ */
+
+@keyframes lueurTitre {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 6px rgb(var(--c-or-300) / var(--lueur-faible)));
+  }
+  50% {
+    filter: drop-shadow(0 0 20px rgb(var(--c-or-300) / var(--lueur-forte)));
+  }
+}
+
+@keyframes pulsationSceau {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(var(--accent, var(--c-or-300)) / 0.35);
+  }
+  55% {
+    box-shadow: 0 0 12px 3px rgb(var(--accent, var(--c-or-300)) / 0.12);
+  }
+}
+
+@keyframes entreePage {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  /* Le titre du frontispice respire dans sa lueur ambrée */
+  .lueur-titre {
+    animation: lueurTitre 5s ease-in-out infinite;
+  }
+
+  /* Transition de route : fondu + glissement de 15px */
+  .entree-page {
+    animation: entreePage 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* --------------------------------------------------------------
+     Révélation au scroll (un seul Intersection Observer, cf.
+     src/hooks/useRevelation.js). L'état de départ n'est appliqué
+     que tant que l'élément n'est pas révélé.
+     -------------------------------------------------------------- */
+  .revele {
+    opacity: 0;
+    transform: translateY(22px);
+    transition:
+      opacity 0.65s ease,
+      transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .revele-gauche {
+    opacity: 0;
+    transform: translateX(-32px);
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .revele-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .tracking-sceau {
+    letter-spacing: 0.28em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
