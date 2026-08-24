@@ -30,7 +30,7 @@ export default function Checklist() {
       <EnteteSection
         surtitre="Points de non-retour"
         titre="Checklists de run"
-        chapeau="En Honneur, il n’y a pas de retour en arrière. Ces listes valident qu’un acte est réellement terminé avant de franchir la porte suivante."
+        chapeau="Ce qui doit être vrai avant de franchir chaque porte : les objets qui ne reviennent pas, les marchands qui disparaissent, les quêtes qui se ferment."
       />
 
       <div className="space-y-6">

@@ -9,7 +9,7 @@ export const ACTES = [
     niveaux: 'Niveaux 1 → 5',
     icone: '🌿',
     resume:
-      'Poser les fondations : premiers paliers de classe, camp stable, et les objets de contrôle qui rendent les combats d’Acte II lisibles.',
+      'La moitié du loadout de contrôle sort d’ici, et les marchands d’Acte I ne réapparaissent pas après Grymforge.',
   },
   {
     id: 2,
@@ -19,7 +19,7 @@ export const ACTES = [
     niveaux: 'Niveaux 5 → 9',
     icone: '🌑',
     resume:
-      'L’acte le plus dangereux en Honneur : ténèbres magiques, embuscades et boss à légendaire. Le loadout doit être bouclé avant l’assaut d’Aubelune.',
+      'Fenêtre courte : les Terres Maudites et Aubelune ferment derrière l’assaut des Tours. Tout ce qui est listé ici est perdu après.',
   },
   {
     id: 3,
@@ -29,7 +29,7 @@ export const ACTES = [
     niveaux: 'Niveaux 9 → 12',
     icone: '🏛️',
     resume:
-      'Montée en puissance finale : les pièces maîtresses des builds se débloquent ici, souvent derrière des quêtes à ne pas rater.',
+      'Les pièces maîtresses sortent toutes ici, et la plupart sont derrière une quête annexe : la Maison de l’Espoir, la tour de Ramazith, le Tabernacle de Stormshore.',
   },
 ]
 

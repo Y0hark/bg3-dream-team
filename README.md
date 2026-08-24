@@ -14,7 +14,7 @@ appareil, ou de la partager avec la team, via un simple code de run.
 | Personnage | Build | Split | Rôle |
 | --- | --- | --- | --- |
 | Sam | Freeze Thunder Frontliner | Clerc de la Tempête 8 / Ensorceleur de la Tempête 4 | Frontliner / contrôle élémentaire / fenêtre de burst |
-| Baptiste | Sorlock Eldritch Control | Occultiste 2 / Ensorceleur 7 / Roublard Voleur 3 | DPS distance |
+| Baptiste | Sorlock Eldritch Blast | Occultiste 2 / Ensorceleur 7 / Roublard Voleur 3 | DPS distance |
 | Lilian | Arcane Archer / Gloom Stalker | Guerrier Archer Arcanique 8 / Rôdeur Traque-Ténèbres 4 | DPS distance / opener |
 | Sidekick | Lore Bard / Life Cleric Support | Barde du Savoir 10 / Clerc de la Vie 2 | Support / contrôle |
 
