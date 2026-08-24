@@ -54,6 +54,30 @@ describe('builds', () => {
     }
   })
 
+  it('prend chaque don à un palier de classe qui en donne un', () => {
+    // Un don se prend au 4e/8e/12e niveau d'UNE classe : sur un multiclasse,
+    // le niveau de personnage ne suffit pas. Le palier correspondant doit donc
+    // annoncer le don dans son `gains`, sinon la fiche promet un don fantôme.
+    for (const build of BUILDS) {
+      for (const feat of build.feats) {
+        const palier = build.leveling.find((entree) => entree.niveau === feat.niveau)
+        expect(palier, `${build.id} : aucun palier au niveau ${feat.niveau}`).toBeDefined()
+        expect(palier.gains, `${build.id} niveau ${feat.niveau} n’annonce pas de don`).toMatch(/Don/)
+      }
+      const niveaux = build.feats.map((feat) => feat.niveau)
+      expect(niveaux).toEqual([...niveaux].sort((a, b) => a - b))
+    }
+  })
+
+  it('n’annonce un don dans le leveling que s’il est détaillé dans les dons', () => {
+    for (const build of BUILDS) {
+      const niveauxDons = new Set(build.feats.map((feat) => feat.niveau))
+      for (const palier of build.leveling.filter((entree) => /Don\s*:/.test(entree.gains))) {
+        expect(niveauxDons, `${build.id} niveau ${palier.niveau}`).toContain(palier.niveau)
+      }
+    }
+  })
+
   it('résout un identifiant connu, et rien d’autre', () => {
     expect(buildDe('sam-freeze-thunder')?.personnage).toBe('Sam')
     expect(buildDe('inconnu')).toBeNull()
@@ -100,6 +124,32 @@ describe('items', () => {
     }
   })
 
+  it('portent tous une source et un lien wiki', () => {
+    // Le catalogue est encodé depuis les fiches bg3.wiki : une entrée sans
+    // source ni lien serait de la mémoire, pas une donnée vérifiée.
+    for (const item of ITEMS) {
+      expect(item.source?.length, `source manquante pour ${item.id}`).toBeGreaterThan(0)
+      expect(item.wiki, `wiki manquant pour ${item.id}`).toMatch(/^https:\/\/bg3\.wiki\/wiki\/\S+$/)
+    }
+  })
+
+  it('couvrent tous les slots portables de chaque personnage', () => {
+    // Le loadout n'est utile que s'il est complet : un slot oublié, c'est un
+    // emplacement joué vide pendant toute la run.
+    const REQUIS = ['Casque', 'Cape', 'Armure', 'Gants', 'Bottes', 'Amulette', 'Anneau']
+    for (const build of BUILDS) {
+      const slots = new Set(
+        ITEMS.filter((item) => item.personnage === build.id).map((item) => item.slot),
+      )
+      for (const slot of REQUIS) {
+        expect(slots, `${build.id} n’a rien au slot ${slot}`).toContain(slot)
+      }
+      expect([...slots].some((slot) => slot.startsWith('Arme')), `${build.id} n’a pas d’arme`).toBe(
+        true,
+      )
+    }
+  })
+
   it('résout un identifiant connu', () => {
     expect(itemDe('markoheshkir')?.nom).toBe('Markoheshkir')
     expect(itemDe('inconnu')).toBeNull()
@@ -107,13 +157,32 @@ describe('items', () => {
 })
 
 describe('lieux', () => {
+  // MapGenie ne publie que ces trois cartes pour BG3 : toute autre URL de carte
+  // est un lien mort (l'ancienne `/maps/faerun` renvoyait un 404).
+  const CARTES = new Set([
+    'https://mapgenie.io/baldurs-gate-3/maps/wilderness',
+    'https://mapgenie.io/baldurs-gate-3/maps/shadow-cursed-lands',
+    'https://mapgenie.io/baldurs-gate-3/maps/baldurs-gate',
+  ])
+
   it('portent un acte valide et des liens externes bien formés', () => {
     for (const lieu of LIEUX) {
       expect(NUMEROS_ACTES).toContain(lieu.acte)
-      for (const lien of [lieu.wiki, lieu.carte]) {
-        if (lien === null) continue
-        expect(lien.startsWith('https://')).toBe(true)
-      }
+      expect(lieu.wiki, `wiki manquant pour ${lieu.id}`).toMatch(/^https:\/\/bg3\.wiki\/wiki\/\S+$/)
+      if (lieu.carte !== null) expect(CARTES, `carte inconnue pour ${lieu.id}`).toContain(lieu.carte)
+    }
+  })
+
+  it('rattachent chaque item à un lieu du bon acte, ou à un lieu antérieur', () => {
+    // Un item d'Acte II ne peut pas être rangé dans une zone d'Acte III : on
+    // ne peut plus y revenir. L'inverse est permis (un marchand d'Acte I qui
+    // reste accessible), mais reste rare : le test cadre le sens du temps.
+    for (const item of ITEMS) {
+      const lieu = lieuDe(item.lieu)
+      if (lieu === null) continue
+      expect(lieu.acte, `${item.id} est rangé dans un lieu d’un acte postérieur`).toBeLessThanOrEqual(
+        item.acte,
+      )
     }
   })
 })

@@ -7,9 +7,13 @@ import {
   etatInitial,
   filtrerItems,
   filtresActifs,
+  filtresDepuisParams,
+  filtresVersParams,
+  grouperParActe,
   itemsCritiques,
   itemsRates,
   normaliserEtat,
+  progressionChecklists,
   progressionParActe,
   statutBascule,
   statutDe,
@@ -156,5 +160,65 @@ describe('trierItems', () => {
     const source = [items[3], items[0]]
     trierItems(source)
     expect(source.map((item) => item.id)).toEqual(['d', 'a'])
+  })
+})
+
+describe('grouperParActe', () => {
+  it('regroupe dans l’ordre des actes et omet les actes vides', () => {
+    const groupes = grouperParActe([items[3], items[0], items[1]])
+    expect(groupes.map((groupe) => groupe.acte.numero)).toEqual([1, 3])
+    expect(groupes[0].items.map((item) => item.id)).toEqual(['a', 'b'])
+  })
+
+  it('rend un tableau vide pour une sélection vide', () => {
+    expect(grouperParActe([])).toEqual([])
+  })
+})
+
+describe('progressionChecklists', () => {
+  const checklists = [
+    { acte: 1, entrees: [{ id: 'a1-x' }, { id: 'a1-y' }] },
+    { acte: 2, entrees: [{ id: 'a2-x' }] },
+  ]
+
+  it('compte les cases cochées par acte et au global', () => {
+    const vue = progressionChecklists(checklists, {
+      items: {},
+      checklist: { 'a1-x': true, 'a2-x': true },
+    })
+    expect(vue.coches).toBe(2)
+    expect(vue.total).toBe(3)
+    expect(vue.pourcentage).toBe(67)
+    expect(vue.parActe.map((entree) => entree.complet)).toEqual([false, true])
+    expect(vue.actesValides).toBe(1)
+  })
+
+  it('rattache chaque checklist à son acte', () => {
+    const vue = progressionChecklists(checklists, etatInitial())
+    expect(vue.parActe[0].acte.nom).toBe('Acte I')
+    expect(vue.pourcentage).toBe(0)
+  })
+})
+
+describe('filtres dans l’URL', () => {
+  it('n’écrit que les filtres actifs', () => {
+    expect(filtresVersParams(FILTRES_VIDES)).toEqual({})
+    expect(filtresVersParams({ ...FILTRES_VIDES, acte: '2', recherche: 'gants' })).toEqual({
+      acte: '2',
+      recherche: 'gants',
+    })
+  })
+
+  it('relit une query string et fait l’aller-retour', () => {
+    const filtres = { ...FILTRES_VIDES, acte: '3', personnage: 'sam-freeze-thunder', statut: 'rate' }
+    const relus = filtresDepuisParams(new URLSearchParams(filtresVersParams(filtres)))
+    expect(relus).toEqual(filtres)
+  })
+
+  it('ignore une valeur inconnue plutôt que de vider le catalogue', () => {
+    const relus = filtresDepuisParams(
+      new URLSearchParams({ acte: '9', personnage: 'inconnu', priorite: 'Z', statut: 'volé' }),
+    )
+    expect(relus).toEqual(FILTRES_VIDES)
   })
 })

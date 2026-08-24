@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import BanniereStockage from './components/BanniereStockage.jsx'
+import FondAnime from './components/FondAnime.jsx'
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
 import RetourEnHaut from './components/RetourEnHaut.jsx'
@@ -38,7 +39,8 @@ export default function App() {
 
   return (
     <FournisseurProgression>
-      <div className="flex min-h-screen flex-col">
+      <FondAnime />
+      <div className="couche-contenu flex min-h-screen flex-col">
         <RestaurerLeScroll />
         <BanniereStockage />
         <Navbar />

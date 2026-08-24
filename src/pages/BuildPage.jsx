@@ -160,7 +160,7 @@ export default function BuildPage() {
         {items.length === 0 ? (
           <EtatVide
             titre="Aucun item rattaché"
-            message="Le catalogue de ce personnage sera complété au ticket 2/4."
+            message="Aucun item du catalogue n’est rattaché à ce personnage."
           />
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

@@ -56,6 +56,14 @@ function TableauLoadout({ items, etat, basculerItem }) {
                   >
                     {item.nom}
                   </span>
+                  {item.aConfirmer && (
+                    <span
+                      className="ml-2 font-rune text-[0.6rem] uppercase tracking-[0.12em] text-gray-500"
+                      title="La source dépend d’un aléa de run : à vérifier sur place"
+                    >
+                      · source à confirmer
+                    </span>
+                  )}
                   <br />
                   <LienExterne href={item.wiki}>Wiki</LienExterne>
                 </td>
@@ -139,7 +147,7 @@ export default function Loadout() {
               {items.length === 0 ? (
                 <EtatVide
                   titre="Loadout à encoder"
-                  message="Les items de ce personnage arrivent au ticket 2/4."
+                  message="Aucun item du catalogue n’est rattaché à ce personnage."
                 />
               ) : (
                 <TableauLoadout items={items} etat={etat} basculerItem={basculerItem} />

@@ -5,6 +5,7 @@
 // se contente de le persister. C'est ce fichier que couvrent les tests.
 // ------------------------------------------------------------------
 import { ACTES } from '../data/actes.js'
+import { BUILDS } from '../data/builds.js'
 import { PRIORITES } from '../data/items.js'
 
 export const STATUTS = [
@@ -197,4 +198,93 @@ export function trierItems(items) {
       (RANG_PRIORITE.get(a.priorite) ?? 99) - (RANG_PRIORITE.get(b.priorite) ?? 99) ||
       a.nom.localeCompare(b.nom, 'fr'),
   )
+}
+
+/**
+ * Regroupe un lot d'items par acte, dans l'ordre des actes. Les actes sans
+ * item sont omis : le catalogue filtré ne doit pas afficher de section vide.
+ */
+export function grouperParActe(items) {
+  return ACTES.map((acte) => ({
+    acte,
+    items: items.filter((item) => item.acte === acte.numero),
+  })).filter((groupe) => groupe.items.length > 0)
+}
+
+/** Comptage d'une checklist : cases cochées sur total, et acte validé ou non. */
+export function compterChecklist(checklist, etat) {
+  const total = checklist?.entrees?.length ?? 0
+  const coches = (checklist?.entrees ?? []).filter((entree) => etat?.checklist?.[entree.id]).length
+  return {
+    coches,
+    total,
+    complet: total > 0 && coches === total,
+    pourcentage: total === 0 ? 0 : Math.round((coches / total) * 100),
+  }
+}
+
+/** Vue d'ensemble des checklists : une entrée par acte, plus le cumul. */
+export function progressionChecklists(checklists, etat) {
+  const parActe = checklists.map((checklist) => ({
+    checklist,
+    acte: ACTES.find((acte) => acte.numero === checklist.acte) ?? null,
+    ...compterChecklist(checklist, etat),
+  }))
+
+  const coches = parActe.reduce((somme, entree) => somme + entree.coches, 0)
+  const total = parActe.reduce((somme, entree) => somme + entree.total, 0)
+
+  return {
+    parActe,
+    coches,
+    total,
+    actesValides: parActe.filter((entree) => entree.complet).length,
+    pourcentage: total === 0 ? 0 : Math.round((coches / total) * 100),
+  }
+}
+
+// ------------------------------------------------------------------
+// Filtres du catalogue dans l'URL
+//
+// Une vue filtrée doit survivre à un rechargement et pouvoir être envoyée
+// telle quelle à un coéquipier : les filtres vivent donc dans la query
+// string. Seuls les filtres actifs y sont écrits — l'URL reste lisible.
+// ------------------------------------------------------------------
+
+export function filtresVersParams(filtres) {
+  const params = {}
+  for (const cle of Object.keys(FILTRES_VIDES)) {
+    const valeur = filtres[cle]
+    if (valeur && valeur !== FILTRES_VIDES[cle]) params[cle] = String(valeur)
+  }
+  return params
+}
+
+/**
+ * Relecture d'une query string. Une valeur inconnue — acte inexistant,
+ * statut renommé depuis, lien vieilli — retombe sur « tous » plutôt que de
+ * vider silencieusement le catalogue.
+ */
+export function filtresDepuisParams(params) {
+  const lire = (cle) => params?.get?.(cle) ?? null
+  const filtres = { ...FILTRES_VIDES }
+
+  const acte = lire('acte')
+  if (acte && ACTES.some((entree) => String(entree.numero) === acte)) filtres.acte = acte
+
+  const personnage = lire('personnage')
+  if (personnage && BUILDS.some((build) => build.id === personnage)) {
+    filtres.personnage = personnage
+  }
+
+  const priorite = lire('priorite')
+  if (priorite && PRIORITES.includes(priorite)) filtres.priorite = priorite
+
+  const statut = lire('statut')
+  if (statut && IDS_STATUTS.has(statut)) filtres.statut = statut
+
+  const recherche = lire('recherche')
+  if (recherche) filtres.recherche = recherche
+
+  return filtres
 }

@@ -7,7 +7,8 @@ export default function Footer() {
           Suivi de run Honneur — fabriqué avec <span aria-hidden="true">🎲</span> pour la dream team
         </p>
         <p className="mt-2 text-xs text-gray-500">
-          Données saisies à la main, progression stockée dans ce navigateur uniquement.
+          Données saisies à la main. Progression stockée dans ce navigateur, et en ligne
+          si un code de run est activé.
         </p>
       </div>
     </footer>

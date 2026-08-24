@@ -1,5 +1,6 @@
 import { Link, NavLink } from 'react-router-dom'
 import SelecteurTheme from './SelecteurTheme.jsx'
+import SynchroRun from './SynchroRun.jsx'
 
 const LIENS = [
   { to: '/', libelle: 'Dashboard', exact: true },
@@ -56,6 +57,9 @@ export default function Navbar() {
               </li>
             ))}
           </ul>
+
+          {/* Sauvegarde en ligne, par code de run partageable */}
+          <SynchroRun />
 
           {/* Bascule de thème : 4 palettes, mémorisée en localStorage */}
           <SelecteurTheme />

@@ -6,6 +6,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   base: '/bg3-dream-team/',
   plugins: [react()],
+  // Les tests de rendu montent des composants sans passer par le plugin
+  // React : sans runtime JSX automatique, ils chercheraient un `React` global.
+  esbuild: { jsx: 'automatic' },
   test: {
     environment: 'node',
     include: ['src/**/*.test.js'],

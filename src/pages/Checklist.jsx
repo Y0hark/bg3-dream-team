@@ -6,7 +6,7 @@ import { BadgeActe } from '../components/Badges.jsx'
 import { acteDe } from '../data/actes.js'
 import { CHECKLISTS } from '../data/checklists.js'
 import { ITEMS } from '../data/items.js'
-import { compter } from '../lib/progression.js'
+import { compter, compterChecklist } from '../lib/progression.js'
 import useProgression from '../hooks/useProgression.jsx'
 
 export default function Checklist() {
@@ -14,14 +14,14 @@ export default function Checklist() {
 
   const parActe = useMemo(
     () =>
-      CHECKLISTS.map((checklist) => {
-        const coches = checklist.entrees.filter((entree) => etat.checklist[entree.id]).length
-        const items = compter(
+      CHECKLISTS.map((checklist) => ({
+        checklist,
+        ...compterChecklist(checklist, etat),
+        items: compter(
           ITEMS.filter((item) => item.acte === checklist.acte),
           etat,
-        )
-        return { checklist, coches, items }
-      }),
+        ),
+      })),
     [etat],
   )
 
@@ -34,10 +34,8 @@ export default function Checklist() {
       />
 
       <div className="space-y-6">
-        {parActe.map(({ checklist, coches, items }, index) => {
+        {parActe.map(({ checklist, coches, total, complet, pourcentage, items }, index) => {
           const acte = acteDe(checklist.acte)
-          const total = checklist.entrees.length
-          const complet = coches === total
 
           return (
             <Revelation key={checklist.acte} delai={index * 90} className="plaque p-5 sm:p-6">
@@ -63,7 +61,7 @@ export default function Checklist() {
                   <BarreProgression
                     libelle="Checklist"
                     detail={`${coches}/${total}`}
-                    pourcentage={total === 0 ? 0 : Math.round((coches / total) * 100)}
+                    pourcentage={pourcentage}
                     teinte={complet ? 'bg-emerald-400/80' : 'bg-or-300/80'}
                   />
                   <BarreProgression

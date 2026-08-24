@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import BarreProgression from '../components/BarreProgression.jsx'
 import EnteteSection from '../components/EnteteSection.jsx'
 import LienExterne from '../components/LienExterne.jsx'
 import Revelation from '../components/Revelation.jsx'
@@ -6,7 +7,7 @@ import { BadgeActe } from '../components/Badges.jsx'
 import { ACTES } from '../data/actes.js'
 import { ITEMS } from '../data/items.js'
 import { LIEUX } from '../data/lieux.js'
-import { estResolu, statutDe } from '../lib/progression.js'
+import { compter, estResolu, statutDe } from '../lib/progression.js'
 import useProgression from '../hooks/useProgression.jsx'
 
 export default function Lieux() {
@@ -52,7 +53,7 @@ export default function Lieux() {
             <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {lieux.map((lieu, index) => {
                 const items = parLieu.get(lieu.id) ?? []
-                const restants = items.filter((item) => !estResolu(statutDe(etat, item.id)))
+                const progression = compter(items, etat)
 
                 return (
                   <Revelation
@@ -91,11 +92,25 @@ export default function Lieux() {
                         </ul>
                       )}
 
-                      <p className="mt-4 font-rune text-[0.62rem] uppercase tracking-[0.14em] text-gray-500">
-                        {items.length === 0
-                          ? 'Aucun item rattaché'
-                          : `${restants.length} item(s) encore à récupérer ici`}
-                      </p>
+                      {items.length === 0 ? (
+                        <p className="mt-4 font-rune text-[0.62rem] uppercase tracking-[0.14em] text-gray-500">
+                          Aucun item rattaché
+                        </p>
+                      ) : (
+                        <BarreProgression
+                          className="mt-4"
+                          libelle="Zone écumée"
+                          detail={
+                            progression.restants === 0
+                              ? 'Rien à récupérer ici'
+                              : `${progression.restants} item(s) restant(s)`
+                          }
+                          pourcentage={progression.pourcentage}
+                          teinte={
+                            progression.rates > 0 ? 'bg-red-400/70' : 'bg-or-300/80'
+                          }
+                        />
+                      )}
 
                       <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-5">
                         <LienExterne href={lieu.wiki}>Wiki</LienExterne>
@@ -124,7 +139,7 @@ export default function Lieux() {
             ))}
           </ul>
           <p className="mt-3 text-sm text-gray-500">
-            Ces sources sont vérifiées et complétées au ticket 2/4.
+            Ces items attendent une source vérifiée : ils restent hors des cartes tant qu’elle n’est pas confirmée.
           </p>
         </Revelation>
       )}

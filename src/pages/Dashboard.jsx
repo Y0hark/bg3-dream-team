@@ -6,12 +6,14 @@ import Revelation from '../components/Revelation.jsx'
 import { BadgeActe, BadgePriorite } from '../components/Badges.jsx'
 import { ACTES } from '../data/actes.js'
 import { BUILDS, buildDe } from '../data/builds.js'
+import { CHECKLISTS } from '../data/checklists.js'
 import { ITEMS } from '../data/items.js'
 import { accentDe, variableAccent } from '../lib/accents.js'
 import {
   compter,
   itemsCritiques,
   itemsRates,
+  progressionChecklists,
   progressionParActe,
   progressionParPersonnage,
   trierItems,
@@ -68,6 +70,7 @@ export default function Dashboard() {
   const global = useMemo(() => compter(ITEMS, etat), [etat])
   const parActe = useMemo(() => progressionParActe(ITEMS, etat), [etat])
   const parPersonnage = useMemo(() => progressionParPersonnage(ITEMS, etat, BUILDS), [etat])
+  const checklists = useMemo(() => progressionChecklists(CHECKLISTS, etat), [etat])
   const rates = useMemo(() => trierItems(itemsRates(ITEMS, etat)), [etat])
   const critiques = useMemo(() => trierItems(itemsCritiques(ITEMS, etat)).slice(0, 6), [etat])
 
@@ -84,11 +87,7 @@ export default function Dashboard() {
       <Revelation className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Compteur valeur={`${global.pourcentage} %`} libelle="Loadout résolu" />
         <Compteur valeur={`${global.resolus}/${global.total}`} libelle="Items sécurisés" />
-        <Compteur
-          valeur={global.restants}
-          libelle="Encore à récupérer"
-          teinte="text-amber-100"
-        />
+        <Compteur valeur={global.restants} libelle="Encore à récupérer" teinte="text-amber-100" />
         <Compteur
           valeur={global.rates}
           libelle="Ratés"
@@ -96,11 +95,17 @@ export default function Dashboard() {
         />
       </Revelation>
 
-      <Revelation className="plaque mt-4 p-5">
+      <Revelation className="plaque mt-4 space-y-4 p-5">
         <BarreProgression
           libelle="Progression globale"
           detail={`${global.resolus} résolus · ${global.rates} ratés · ${global.restants} restants`}
           pourcentage={global.pourcentage}
+        />
+        <BarreProgression
+          libelle="Checklists de fin d’acte"
+          detail={`${checklists.coches}/${checklists.total} validés · ${checklists.actesValides}/${ACTES.length} actes bouclés`}
+          pourcentage={checklists.pourcentage}
+          teinte={checklists.actesValides === ACTES.length ? 'bg-emerald-400/80' : 'bg-or-300/80'}
         />
       </Revelation>
 
@@ -137,7 +142,9 @@ export default function Dashboard() {
                       {build.icone}
                     </span>
                     <div className="min-w-0">
-                      <p className={`font-display text-sm uppercase tracking-[0.1em] ${accent.texte}`}>
+                      <p
+                        className={`font-display text-sm uppercase tracking-[0.1em] ${accent.texte}`}
+                      >
                         {build.personnage}
                       </p>
                       <p className="truncate font-rune text-[0.62rem] uppercase tracking-[0.14em] text-gray-500">
@@ -166,31 +173,52 @@ export default function Dashboard() {
           Progression par acte
         </h2>
         <div className="grid gap-4 lg:grid-cols-3">
-          {parActe.map(({ acte, ...progression }, index) => (
-            <Revelation key={acte.id} delai={index * 90} className="plaque flex flex-col p-5">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="font-display text-lg uppercase tracking-[0.12em] text-or-100">
-                    <span aria-hidden="true" className="mr-2">
-                      {acte.icone}
-                    </span>
-                    {acte.nom}
-                  </p>
-                  <p className="mt-1 font-rune text-[0.62rem] uppercase tracking-[0.14em] text-gray-500">
-                    {acte.niveaux}
-                  </p>
+          {parActe.map(({ acte, ...progression }, index) => {
+            const checklist = checklists.parActe.find(
+              (entree) => entree.checklist.acte === acte.numero,
+            )
+            return (
+              <Revelation key={acte.id} delai={index * 90} className="plaque flex flex-col p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-display text-lg uppercase tracking-[0.12em] text-or-100">
+                      <span aria-hidden="true" className="mr-2">
+                        {acte.icone}
+                      </span>
+                      {acte.nom}
+                    </p>
+                    <p className="mt-1 font-rune text-[0.62rem] uppercase tracking-[0.14em] text-gray-500">
+                      {acte.niveaux}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <BadgeActe numero={acte.numero} />
+                    {checklist?.complet && (
+                      <p className="mt-2 font-rune text-[0.6rem] uppercase tracking-[0.14em] text-emerald-300">
+                        Acte validé
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <BadgeActe numero={acte.numero} />
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-gray-400">{acte.resume}</p>
-              <BarreProgression
-                className="mt-auto pt-5"
-                libelle="Items de l’acte"
-                detail={`${progression.resolus}/${progression.total}`}
-                pourcentage={progression.pourcentage}
-              />
-            </Revelation>
-          ))}
+                <p className="mt-3 text-sm leading-relaxed text-gray-400">{acte.resume}</p>
+                <div className="mt-auto space-y-3 pt-5">
+                  <BarreProgression
+                    libelle="Items de l’acte"
+                    detail={`${progression.resolus}/${progression.total}`}
+                    pourcentage={progression.pourcentage}
+                  />
+                  {checklist && (
+                    <BarreProgression
+                      libelle="Checklist"
+                      detail={`${checklist.coches}/${checklist.total}`}
+                      pourcentage={checklist.pourcentage}
+                      teinte={checklist.complet ? 'bg-emerald-400/80' : 'bg-or-300/80'}
+                    />
+                  )}
+                </div>
+              </Revelation>
+            )
+          })}
         </div>
       </section>
 
@@ -258,7 +286,9 @@ export default function Dashboard() {
         <div>
           <p className="grave text-base tracking-[0.1em]">Avant chaque point de non-retour</p>
           <p className="mt-1 text-sm text-gray-400">
-            {ACTES.length} checklists de fin d’acte : ce qui doit être vrai avant de franchir la porte.
+            {checklists.actesValides === ACTES.length
+              ? 'Les trois checklists sont validées : aucun point de non-retour en suspens.'
+              : `${checklists.total - checklists.coches} points encore à valider sur ${ACTES.length} checklists de fin d’acte.`}
           </p>
         </div>
         <Link to="/checklist" className="bouton">

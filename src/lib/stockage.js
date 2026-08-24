@@ -1,10 +1,18 @@
 // ------------------------------------------------------------------
-// Persistance locale. Aucun backend : la progression vit dans le
-// localStorage du navigateur. En navigation privée ou stockage refusé,
-// l'app reste utilisable — elle le signale simplement à l'utilisateur.
+// Persistance locale. Le localStorage reste la source immédiate : l'app
+// fonctionne hors ligne et sans aucun serveur. La sauvegarde distante
+// (cf. src/lib/nuage.js) vient par-dessus, jamais à la place. En
+// navigation privée ou stockage refusé, l'app reste utilisable — elle le
+// signale simplement à l'utilisateur.
 // ------------------------------------------------------------------
 
 export const CLE_PROGRESSION = 'bg3-progression'
+
+/** Code de la run synchronisée, vide tant que la synchro n'est pas activée. */
+export const CLE_CODE_RUN = 'bg3-code-run'
+
+/** Dernier horodatage serveur connu — sert à détecter l'écriture d'un autre appareil. */
+export const CLE_MAJ_DISTANTE = 'bg3-maj-distante'
 
 /** Test d'écriture réel : `localStorage` peut exister et lever à l'usage. */
 export function stockageDisponible() {

@@ -309,24 +309,8 @@
 
   body {
     @apply bg-encre font-grimoire text-gray-200 antialiased;
-    /* Trois halos de bougie posés sur le fond */
-    background-image:
-      radial-gradient(
-        60rem 40rem at 12% -10%,
-        rgb(var(--halo-a) / var(--halo-force)),
-        transparent 60%
-      ),
-      radial-gradient(
-        50rem 40rem at 100% 0%,
-        rgb(var(--halo-b) / var(--halo-force)),
-        transparent 60%
-      ),
-      radial-gradient(
-        70rem 50rem at 50% 120%,
-        rgb(var(--halo-c) / var(--halo-force)),
-        transparent 65%
-      );
-    background-attachment: fixed;
+    /* Les halos de bougie ne sont plus peints ici : ils dérivent désormais
+       dans le décor animé (.nappe, cf. <FondAnime />). */
     min-height: 100vh;
   }
 
@@ -502,6 +486,97 @@
   .sceau-critique {
     animation: pulsationSceau 2.6s ease-in-out infinite;
   }
+
+  /* ----------------------------------------------------------------
+     Décor animé (cf. src/components/FondAnime.jsx). Tout est fixé,
+     derrière le contenu et transparent aux clics : nappes de lumière
+     qui dérivent, cercle d'invocation qui tourne, braises en canvas.
+     ---------------------------------------------------------------- */
+  .fond-anime {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .nappe {
+    position: absolute;
+    display: block;
+    border-radius: 9999px;
+    filter: blur(60px);
+    opacity: 0.75;
+    will-change: transform;
+  }
+  .nappe-a {
+    top: -18%;
+    left: -12%;
+    width: 62vw;
+    height: 62vw;
+    background: radial-gradient(circle, rgb(var(--halo-a) / var(--halo-force)), transparent 68%);
+    animation: deriveNappe 34s ease-in-out infinite;
+  }
+  .nappe-b {
+    top: -10%;
+    right: -18%;
+    width: 55vw;
+    height: 55vw;
+    background: radial-gradient(circle, rgb(var(--halo-b) / var(--halo-force)), transparent 68%);
+    animation: deriveNappe 46s ease-in-out infinite reverse;
+  }
+  .nappe-c {
+    bottom: -28%;
+    left: 22%;
+    width: 70vw;
+    height: 70vw;
+    background: radial-gradient(circle, rgb(var(--halo-c) / var(--halo-force)), transparent 70%);
+    animation: deriveNappe 58s ease-in-out infinite;
+  }
+
+  /* Cercle d'invocation : deux anneaux pointillés en rotation lente */
+  .cercle-runique {
+    position: absolute;
+    top: 42%;
+    left: 50%;
+    width: min(120vh, 120vw);
+    height: min(120vh, 120vw);
+    border-radius: 9999px;
+    border: 1px dashed rgb(var(--c-or-500) / 0.16);
+    box-shadow:
+      inset 0 0 0 1px rgb(var(--c-or-500) / 0.05),
+      inset 0 0 0 12vh rgb(var(--c-or-500) / 0);
+    animation:
+      rotationRunique 240s linear infinite,
+      respirationRunique 18s ease-in-out infinite;
+    will-change: transform;
+  }
+  .cercle-runique::before {
+    content: '';
+    position: absolute;
+    inset: 14%;
+    border-radius: 9999px;
+    border: 1px solid rgb(var(--c-or-500) / 0.1);
+  }
+  .cercle-runique::after {
+    content: '';
+    position: absolute;
+    inset: 32%;
+    border-radius: 9999px;
+    border: 1px dashed rgb(var(--c-or-500) / 0.12);
+  }
+
+  .braises {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Le contenu passe devant le décor */
+  .couche-contenu {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 /* ------------------------------------------------------------------
@@ -525,6 +600,38 @@
   }
   55% {
     box-shadow: 0 0 12px 3px rgb(var(--accent, var(--c-or-300)) / 0.12);
+  }
+}
+
+@keyframes deriveNappe {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    transform: translate3d(6%, -4%, 0) scale(1.12);
+  }
+  66% {
+    transform: translate3d(-5%, 5%, 0) scale(0.94);
+  }
+}
+
+@keyframes rotationRunique {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes respirationRunique {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.9;
   }
 }
 
