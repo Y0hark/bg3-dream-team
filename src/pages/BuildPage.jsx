@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import BarreProgression from '../components/BarreProgression.jsx'
 import EnteteSection from '../components/EnteteSection.jsx'
 import ItemCard from '../components/ItemCard.jsx'
+import LienExterne from '../components/LienExterne.jsx'
 import Revelation from '../components/Revelation.jsx'
 import EtatVide from '../components/EtatVide.jsx'
 import { buildDe } from '../data/builds.js'
@@ -141,6 +142,31 @@ export default function BuildPage() {
         <Liste titre="Synergies d’équipe" entrees={build.synergies} accent={accent} />
         <Liste titre="Points de vigilance" entrees={build.vigilance} accent={accent} />
       </div>
+
+      {/* --- Références bg3.wiki -------------------------------------- */}
+      {build.lexique?.length > 0 && (
+        <section className="mt-12" aria-labelledby="titre-lexique">
+          <h2 id="titre-lexique" className="grave text-xl tracking-[0.1em]">
+            Références bg3.wiki
+          </h2>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-gray-400">
+            Termes de sorts, aptitudes et conditions laissés en anglais faute de traduction FR
+            vérifiée en jeu. Suivre le lien pour voir l’icône et le libellé exact.
+          </p>
+          <ul className="mt-4 flex flex-wrap gap-2">
+            {build.lexique.map((entree) => (
+              <li key={entree.nom}>
+                <LienExterne
+                  href={entree.wiki}
+                  className="rounded-sm border border-or-700/30 bg-voile/[0.03] px-3 py-1.5 !text-[0.7rem] !normal-case !tracking-normal !text-gray-300 hover:!text-or-100"
+                >
+                  {entree.nom}
+                </LienExterne>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* --- Loadout du personnage ------------------------------------- */}
       <section className="mt-12" aria-labelledby="titre-loadout">

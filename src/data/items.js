@@ -28,7 +28,7 @@ export const ITEMS = [
   // Sam — Clerc de la Tempête 8 / Ensorceleur de la Tempête 4
   //
   // Tout le loadout sert une seule chaîne : Encrusted with Frost →
-  // Glacé → Mouillé → Gelé → un gros coup de tonnerre. Les pièces qui
+  // Chilled → Wet → Gelé → un gros coup de tonnerre. Les pièces qui
   // n'alimentent pas cette chaîne sont notées pour ce qu'elles valent.
   // ================================================================
   {
@@ -42,7 +42,7 @@ export const ITEMS = [
     source:
       'Assemblé à partir de trois composants : Icy Crystal (Filro l’Oublié, près de l’arbre Sussur), Icy Helve (Dhourn, à l’ouest de l’avant-poste sélûnite), Icy Metal (Xargrim, zone secrète de la colonie myconide).',
     wiki: wiki('Mourning_Frost'),
-    note: 'Froid insidieux : les dégâts de froid appliquent Glacé. C’est LA source de Glacé du build, et sans Glacé il n’y a ni Gelé ni fenêtre tonnerre. Il donne aussi Trait glacial gratuitement et +1 aux dégâts de froid. Combiner les trois pièces dans un seul inventaire.',
+    note: 'Froid insidieux : les dégâts de froid appliquent Chilled. C’est LA source de Chilled du build, et sans Chilled il n’y a ni Gelé ni fenêtre tonnerre. Il donne aussi le sort mineur Ray of Frost gratuitement et +1 aux dégâts de froid. Combiner les trois pièces dans un seul inventaire.',
   },
   {
     id: 'winters-clutches',
@@ -54,7 +54,7 @@ export const ITEMS = [
     lieu: 'sentier-rosemorne',
     source: 'Vendus par Lady Esther, au nord-est du point de passage de Trielta Crags (aussi donnés par Glut après « Venger le cercle de Glut », ou en vente à Sorcelleries Sundries en Acte III).',
     wiki: wiki('Winter%27s_Clutches'),
-    note: 'Les dégâts de froid appliquent 2 tours de Givre incrusté. C’est la pièce qui rend Gelé jouable : sans elle, Gelé dure 1 tour et expire au début du tour de la cible, sans jamais l’immobiliser. Avec elle, Gelé dure 2 tours — un round complet d’Incapacité.',
+    note: 'Les dégâts de froid appliquent 2 tours d’Encrusted with Frost. C’est la pièce qui rend Gelé jouable : sans elle, Gelé dure 1 tour et expire au début du tour de la cible, sans jamais l’immobiliser. Avec elle, Gelé dure 2 tours — un round complet d’Incapacité.',
   },
   {
     id: 'gloves-belligerent-skies',
@@ -66,7 +66,7 @@ export const ITEMS = [
     lieu: 'creche-yllek',
     source: 'Coffre élégant de la chambre de l’Inquisiteur, contre le mur sud.',
     wiki: wiki('Gloves_of_Belligerent_Skies'),
-    note: 'Foudre, tonnerre ou radiant appliquent 2 tours de Réverbération. Concurrent direct des Winter’s Clutches sur le même slot : la Réverbération est le contrôle de fond de l’équipe, le Givre incrusté est la clé du combo de Sam. Arbitrage par défaut — Winter’s Clutches sur Sam, ces gants sur le Sidekick si un porteur radiant se dégage.',
+    note: 'Foudre, tonnerre ou radiant appliquent 2 tours de Réverbération. Concurrent direct des Winter’s Clutches sur le même slot : la Réverbération est le contrôle de fond de l’équipe, Encrusted with Frost est la clé du combo de Sam. Arbitrage par défaut — Winter’s Clutches sur Sam, ces gants sur le Sidekick si un porteur radiant se dégage.',
   },
   {
     id: 'armure-adamantine',
@@ -90,7 +90,7 @@ export const ITEMS = [
     lieu: 'grotte-ebonlake',
     source: 'Vendues par Omeluum après « Aider Omeluum à enquêter sur le parasite ».',
     wiki: wiki('Boots_of_Stormy_Clamour'),
-    note: 'Toute condition infligée à un ennemi ajoute 2 tours de Réverbération. Sam applique Glacé, Givre incrusté et Mouillé à longueur de tour : ces bottes transforment chaque étape du setup en malus de sauvegarde.',
+    note: 'Toute condition infligée à un ennemi ajoute 2 tours de Réverbération. Sam applique Chilled, Encrusted with Frost et Wet à longueur de tour : ces bottes transforment chaque étape du setup en malus de sauvegarde.',
   },
   {
     id: 'real-sparky-sparkswall',
@@ -234,7 +234,7 @@ export const ITEMS = [
     lieu: 'tour-ramazith',
     source: 'Sous un globe d’invulnérabilité : Voir l’invisible révèle le levier, puis Arcanes DD 20.',
     wiki: wiki('Markoheshkir'),
-    note: 'Bâton légendaire +2 : +1 au DD et aux attaques de sort, Batterie arcanique (un sort gratuit par repos long) et Faveur de Kereska. Mais il n’applique PAS Glacé : l’équiper à la place de Mourning Frost supprime la source de Glacé, donc Gelé, donc le combo. À sortir pour les combats de pure puissance, pas comme bâton par défaut.',
+    note: 'Bâton légendaire +2 : +1 au DD et aux attaques de sort, Batterie arcanique (un sort gratuit par repos long) et Faveur de Kereska. Mais il n’applique PAS Chilled : l’équiper à la place de Mourning Frost supprime la source de Chilled, donc Gelé, donc le combo. À sortir pour les combats de pure puissance, pas comme bâton par défaut.',
   },
   {
     id: 'amulet-greater-health',
@@ -434,7 +434,7 @@ export const ITEMS = [
   },
 
   // ================================================================
-  // Lilian — Guerrier Archer Arcanique 8 / Rôdeur Traque-Ténèbres 4
+  // Lilian — Guerrier Archer Arcanique 8 / Rôdeur Gloom Stalker 4
   // ================================================================
   {
     id: 'gloves-of-archery',

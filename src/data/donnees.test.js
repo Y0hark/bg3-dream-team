@@ -82,6 +82,19 @@ describe('builds', () => {
     expect(buildDe('sam-freeze-thunder')?.personnage).toBe('Sam')
     expect(buildDe('inconnu')).toBeNull()
   })
+
+  it('renvoie chaque entrée de lexique vers une fiche bg3.wiki en https', () => {
+    // Les termes laissés en anglais (VF non vérifiée) doivent tous être
+    // cliquables vers le wiki : c'est là qu'on lève le doute en jeu.
+    for (const build of BUILDS) {
+      for (const entree of build.lexique ?? []) {
+        expect(entree.nom?.length, `${build.id} : entrée de lexique sans nom`).toBeGreaterThan(0)
+        expect(entree.wiki, `${build.id} : lexique « ${entree.nom} »`).toMatch(
+          /^https:\/\/bg3\.wiki\/wiki\/\S+$/,
+        )
+      }
+    }
+  })
 })
 
 describe('items', () => {
