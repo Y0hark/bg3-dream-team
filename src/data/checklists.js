@@ -14,7 +14,7 @@ export const CHECKLISTS = [
       { id: 'a1-phalar', texte: 'Porteur de Phalar Aluve désigné : la main de Sam est prise par Mourning Frost, donc le Sidekick par défaut.' },
       { id: 'a1-statstick', texte: 'Club of Hill Giant Strength récupéré à la tour arcanique et équipé en main de mêlée sur Lilian : le Titanstring ne vaut rien sans.' },
       { id: 'a1-camp', texte: 'Stock de camp : flèches, potions de soin majeures, parchemins de Rappel à la vie, et un stock d’élixirs de Force de géant des collines — le Titanstring de Lilian ne vaut rien sans.' },
-      { id: 'a1-cheveu', texte: 'Cheveu de la mégère (Tante Ethel) attribué à Baptiste : CHA 17 → 18, pour que son unique ASI le porte à 20 pile.' },
+      { id: 'a1-cheveu', texte: 'Cheveu de la mégère (Tante Ethel) : Baptiste ne dépend plus d’un point de CHA externe, son unique ASI suffit à porter 16 → 18. À garder en réserve pour le Sidekick si sa propre ligne de charisme en profite.' },
       { id: 'a1-respec', texte: 'Les respec de mi-parcours sont faits (Withers) : plus cher plus tard.' },
     ],
   },
