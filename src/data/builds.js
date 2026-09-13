@@ -16,7 +16,7 @@
 // de chaque build renvoie vers bg3.wiki (icône + libellé exact en jeu) pour
 // lever le doute. Les sorts dont la VF est sûre (Bénédiction, Hâte, Contresort,
 // Gardiens spirituels, Pas brumeux, Fracassement…) restent en français.
-const wiki = (page) => `https://bg3.wiki/wiki/${page}`
+const wiki = (page) => `{{https://bg3.wiki/wiki/${page}}}`
 
 export const BUILDS = [
   {
@@ -110,10 +110,10 @@ export const BUILDS = [
       { niveau: 2, classe: 'Occultiste 2', gains: 'Deux Manifestations occultes : Devil’s Sight (vision dans les ténèbres, magiques comprises) et Armor of Shadows (Bouclier magique gratuit, une fois par repos court).' },
       { niveau: 3, classe: 'Occultiste 3', gains: 'Dons de pacte : Pacte de la Lame — invoquer une arme liée dans la main à volonté.' },
       { niveau: 4, classe: 'Occultiste 4', gains: 'Don : CHA +2 (16 → 18).' },
-      { niveau: 5, classe: 'Occultiste 5', gains: 'Troisième Manifestation occulte (Fiendish Vigor, False Life gratuit) et Pacte approfondi : seconde attaque avec l’arme liée.' },
-      { niveau: 6, classe: 'Occultiste 6', gains: 'Spectre maudit : quand une cible portant Hexblade’s Curse meurt, invoque un spectre à ses côtés.' },
-      { niveau: 7, classe: 'Druide 1', gains: 'Forme sauvage et sorts de Druide sur SAG : Longstrider, Healing Word.' },
-      { niveau: 8, classe: 'Druide 2', gains: 'Cercle des Spores : Halo of Spores (réaction nécrotique de zone) et Symbiotic Entity (4 PV temporaires par niveau de Druide, soit 8, plus 1d6 nécrotique par attaque de mêlée tant que les PV temporaires tiennent).' },
+      { niveau: 5, classe: 'Druide 1', gains: 'Forme sauvage et sorts de Druide sur SAG : Longstrider, Healing Word.' },
+      { niveau: 6, classe: 'Druide 2', gains: 'Cercle des Spores : Halo of Spores (réaction nécrotique de zone) et Symbiotic Entity (4 PV temporaires par niveau de Druide, soit 8, plus 1d6 nécrotique par attaque de mêlée tant que les PV temporaires tiennent).' },
+      { niveau: 7, classe: 'Occultiste 5', gains: 'Troisième Manifestation occulte (Fiendish Vigor, False Life gratuit) et Pacte approfondi : seconde attaque avec l’arme liée.' },
+      { niveau: 8, classe: 'Occultiste 6', gains: 'Spectre maudit : quand une cible portant Hexblade’s Curse meurt, invoque un spectre à ses côtés.' },
       { niveau: 9, classe: 'Druide 3', gains: 'Sorts de niveau 2 : Spike Growth, Moonbeam.' },
       { niveau: 10, classe: 'Druide 4', gains: 'Don : Incantateur de guerre.' },
       { niveau: 11, classe: 'Druide 5', gains: 'Sorts de niveau 3 : Animate Dead — le premier mort-vivant permanent de l’armée.' },
@@ -131,6 +131,7 @@ export const BUILDS = [
       'Le Spectre maudit se déclenche sur n’importe quelle cible sous Hexblade’s Curse tuée par l’équipe, pas seulement par Baptiste : un finisher de Lilian ou de Sam suffit à le lever.',
     ],
     vigilance: [
+      'Pacte approfondi (2e attaque avec l’arme liée) recule du niveau de personnage 5 au niveau 7 : l’ordre choisi fait passer Symbiotic Entity et Halo of Spores en ligne dès le niveau 6 plutôt que le niveau 8, pour des PV temporaires disponibles avant Grymforge, le Bulette et la patrouille githyanki de la Crèche — au prix de deux niveaux sans la seconde attaque.',
       'Sans la Potent Robe, il n’y a plus de multiplicateur de sort mineur à empiler : le loadout doit désormais servir l’arme liée, pas les rayons.',
       'Le bonus nécrotique de Symbiotic Entity et le rider de dégâts disparaissent dès que les PV temporaires tombent à zéro : c’est la vraie jauge de puissance du build, pas les PV réels.',
       'Le sort Hex (avec concentration) est volontairement écarté : il ferait doublon avec Spike Growth ou Moonbeam sur l’unique concentration disponible. Hexblade’s Curse, qui n’en demande aucune, reste le moteur de dégâts constant.',
