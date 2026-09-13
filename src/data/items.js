@@ -21,7 +21,7 @@
 /** Ordre d'affichage des priorités, du plus critique au plus accessoire. */
 export const PRIORITES = ['S+', 'S', 'A', 'B']
 
-const wiki = (page) => `https://bg3.wiki/wiki/${page}`
+const wiki = (page) => `{{https://bg3.wiki/wiki/${page}}}`
 
 export const ITEMS = [
   // ================================================================
@@ -306,17 +306,28 @@ export const ITEMS = [
   // de Symbiotic Entity, pas les rayons d'Explosion occulte.
   // ================================================================
   {
-    id: 'sylvan-scimitar',
-    nom: 'Sylvan Scimitar',
-    slot: 'Arme (cimeterre)',
+    id: 'the-baneful',
+    nom: 'The Baneful',
+    slot: 'Arme (épée courte)',
+    acte: 1,
+    personnage: 'baptiste-hexblade-spores',
+    priorite: 'S+',
+    lieu: 'grotte-ebonlake',
+    source: 'Vendue par Blurg, à la Grotte d’Ébènelac (colonie myconide).',
+    wiki: wiki('The_Baneful'),
+    note: 'Favoured Weapon (+1 au toucher et aux dégâts) se déclenche via Bind Hexed Weapon, pas seulement par un Pacte de la Lame classique — confirmé sur bg3.wiki. Baneful Bond ajoute une chance d’infliger Fléau (Bane) au toucher, sans concentration. Effectivement une arme +2 une fois liée. La propriété Melee Caster du Sylvan Scimitar qu’elle remplace ne servait à rien : Bind Hexed Weapon utilise déjà le CHA.',
+  },
+  {
+    id: 'sword-of-life-stealing',
+    nom: 'Sword of Life Stealing',
+    slot: 'Arme (épée courte)',
     acte: 2,
     personnage: 'baptiste-hexblade-spores',
     priorite: 'S+',
     lieu: 'auberge-derniere-lumiere',
-    aConfirmer: true,
-    source: 'Portée par Jaheira, à l’Auberge de la Dernière Lumière — mode d’obtention exact (achat, don ou fouille) à vérifier en jeu selon la relation avec elle.',
-    wiki: wiki('Sylvan_Scimitar'),
-    note: 'Propriété Melee Caster : les jets de toucher et de dégâts utilisent le modificateur d’incantation à la place de la Dextérité. C’est l’une des deux seules armes du jeu à porter cette propriété — l’autre, l’Infernal Rapier, ne s’obtient que via la quête personnelle de Wyll, absent de cette équipe. Liée par Bind Hexed Weapon dès l’Occultiste 1, elle devient l’arme signature du build sans dépendre d’un compagnon.',
+    source: 'Vendue par Dammon, à l’Auberge de la Dernière Lumière.',
+    wiki: wiki('Sword_of_Life_Stealing'),
+    note: 'Épée +2, sans condition de liaison : Life Stealing Critical ajoute 10 dégâts nécrotiques (hors morts-vivants/constructs) et 10 PV temporaires au porteur sur chaque critique. Attention : ces PV temporaires partagent la même StackPriority basse que ceux de Symbiotic Entity — l’un peut écraser l’autre selon l’ordre d’application, mais les dégâts nécrotiques tombent toujours. Remplace le Sylvan Scimitar, dont le Melee Caster était inutile ici (Bind Hexed Weapon utilise déjà le CHA).',
   },
   {
     id: 'amulet-misty-step',
@@ -340,7 +351,7 @@ export const ITEMS = [
     lieu: 'grotte-ebonlake',
     source: 'Vendu par Derryth Bonecloak, à la Grotte d’Ébènelac (colonie myconide).',
     wiki: wiki('Caustic_Band'),
-    note: '+2 dégâts acides sur chaque attaque d’arme (Malefic Excretion), dès l’Acte I : un rider fiable sur les deux attaques du Sylvan Scimitar, sans condition à maintenir.',
+    note: '+2 dégâts acides sur chaque attaque d’arme (Malefic Excretion), dès l’Acte I : un rider fiable sur les deux attaques de l’arme liée, sans condition à maintenir.',
   },
   {
     id: 'callous-glow-ring',
@@ -352,7 +363,7 @@ export const ITEMS = [
     lieu: 'temple-shar',
     source: 'Coffre opulent de la chambre forte, près de Balthazar.',
     wiki: wiki('Callous_Glow_Ring'),
-    note: '+2 dégâts radiants sur les cibles éclairées, sur chaque attaque — y compris les attaques d’arme liées : un vrai multiplicateur pour le Sylvan Scimitar, pas seulement pour des sorts.',
+    note: '+2 dégâts radiants sur les cibles éclairées, sur chaque attaque — y compris les attaques d’arme liées : un vrai multiplicateur pour l’arme de Baptiste, pas seulement pour des sorts.',
   },
   {
     id: 'evasive-shoes',
