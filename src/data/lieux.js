@@ -87,7 +87,7 @@ export const LIEUX = [
     id: 'ombreterre',
     nom: 'Ombreterre',
     acte: 1,
-    resume: 'Les trois composants de Mourning Frost sont portés par trois mages drows dispersés dans la zone. Phalar Aluve est plantée dans la pierre, et l’avant-poste sélûnite garde la Luminous Armour.',
+    resume: 'Les trois composants de Mourning Frost sont portés par trois mages drows dispersés dans la zone. Phalar Aluve est plantée dans la pierre, et l’avant-poste selûnite garde la Luminous Armour.',
     wiki: wiki('Underdark'),
     carte: null,
   },
@@ -122,6 +122,14 @@ export const LIEUX = [
     resume: 'Deux veines de mithral dans le Refuge abandonné : de quoi couler deux moules, l’armure et le bouclier. Grym, le golem gardien, porte le Grymskull Helm.',
     wiki: wiki('Adamantine_Forge'),
     carte: null,
+  },
+  {
+    id: 'antre-ethel',
+    nom: 'Antre d’Ethel (Marais Ensoleillé)',
+    acte: 1,
+    resume: 'Réduire Ethel sous 20 % de PV dans son Antre Ancien puis accepter de négocier sa vie : elle cède Auntie Ethel’s Hair avant de disparaître, sans laisser de corps.',
+    wiki: wiki('Auntie_Ethel'),
+    carte: CARTE_ACTE_I,
   },
 
   // --------------------------------------------------------------- Acte II
