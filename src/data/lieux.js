@@ -11,7 +11,7 @@
 // `carte: null` volontairement.
 // ------------------------------------------------------------------
 
-const wiki = (page) => `https://bg3.wiki/wiki/${page}`
+const wiki = (page) => "https://bg3.wiki/wiki/" + page
 
 const CARTE_ACTE_I = 'https://mapgenie.io/baldurs-gate-3/maps/wilderness'
 const CARTE_ACTE_II = 'https://mapgenie.io/baldurs-gate-3/maps/shadow-cursed-lands'
