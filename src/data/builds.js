@@ -16,7 +16,7 @@
 // de chaque build renvoie vers bg3.wiki (icône + libellé exact en jeu) pour
 // lever le doute. Les sorts dont la VF est sûre (Bénédiction, Hâte, Contresort,
 // Gardiens spirituels, Pas brumeux, Fracassement…) restent en français.
-const wiki = (page) => `https://bg3.wiki/wiki/${page}`
+HELPERLINE
 
 export const BUILDS = [
   {
@@ -283,3 +283,4 @@ export function buildDe(id) {
 export function nomCourtDe(id) {
   return buildDe(id)?.personnage ?? 'Équipe'
 }
+".replace("HELPERLINE
