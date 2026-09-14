@@ -21,7 +21,7 @@
 /** Ordre d'affichage des priorités, du plus critique au plus accessoire. */
 export const PRIORITES = ['S+', 'S', 'A', 'B']
 
-const wiki = (page) => `https://bg3.wiki/wiki/${page}`
+const wiki = (page) => "https://bg3.wiki/wiki/" + page
 
 export const ITEMS = [
   // ================================================================
