@@ -514,6 +514,18 @@ export const ITEMS = [
     note: '+1d4 psychique par attaque tant que la concentration tient : Marque du chasseur suffit à l’activer à chaque combat.',
   },
   {
+    id: 'grymskull-helm',
+    nom: 'Grymskull Helm',
+    slot: 'Casque',
+    acte: 1,
+    personnage: 'lilian-arcane-archer',
+    priorite: 'S',
+    lieu: 'forge-adamantine',
+    source: 'Porté par Grym, le golem gardien de la Forge adamantine.',
+    wiki: wiki('Grymskull_Helm'),
+    note: 'Aucun critique subi, résistance au feu, et Marque du chasseur gratuite (lancée comme un sort de niveau 1, 1×/repos long, sans coûter d’emplacement). Comble le trou de casque de Lilian en Acte I/II — le combat contre Grym est sur le chemin du groupe. La mention « Proficiency requise : Armure lourde » est un artefact du set Adamantine partagé avec les armures/boucliers : les casques n’imposent pas cette restriction en jeu, et Lilian (Guerrier) l’a de toute façon.',
+  },
+  {
     id: 'yuan-ti-scale-mail',
     nom: 'Yuan-Ti Scale Mail',
     slot: 'Armure',
@@ -615,16 +627,17 @@ export const ITEMS = [
   // Sidekick — Barde du Savoir 10 / Clerc de la Vie 2
   // ================================================================
   {
-    id: 'hellriders-pride',
-    nom: 'Hellrider’s Pride',
+    id: 'gloves-of-power',
+    nom: 'Gloves of Power',
     slot: 'Gants',
     acte: 1,
     personnage: 'sidekick-bard-cleric',
-    priorite: 'S',
-    lieu: 'bosquet-emeraude',
-    source: 'Portés par Zevlor dans la chambre isolée : butin, vol, ou récompense de « Enquêter sur Kagha ».',
-    wiki: wiki('Hellrider%27s_Pride'),
-    note: 'Chaque soin donne 2 tours de Blade Ward — résistance aux dégâts d’arme — à la CIBLE, jamais au porteur, et sans se cumuler avec lui-même. Avec Mot de guérison en action bonus, c’est une résistance quasi permanente sur celui qui tient la ligne.',
+    priorite: 'B',
+    lieu: 'abords-bosquet-emeraude',
+    source: 'Portés par Za’krug, devant l’entrée du Bosquet d’Émeraude — butin obtenu en le tuant, sans jamais franchir la porte scellée par les druides.',
+    wiki: wiki('Gloves_of_Power'),
+    note: 'Remplace les Hellrider’s Pride, rendus inaccessibles par la fermeture du Bosquet. Absolute’s Bane peut infliger Fléau (DD CHA 11, -1d4 au toucher et aux sauvegardes, 2 tours) à la cible sur un coup d’arme réussi — mais nécessite que le porteur ait la Marque de l’Absolu (sans elle, l’effet ne se déclenche jamais), ne fonctionne pas en disguise, et ne se cumule pas avec une autre source de Fléau, dont Baneful Bond de The Baneful porté par Baptiste. Un cran nettement sous le Blade Ward d’équipe perdu : accepté comme un downgrade de slot, pas un vrai remplacement fonctionnel.',
+    aConfirmer: true,
   },
   {
     id: 'whispering-promise',
