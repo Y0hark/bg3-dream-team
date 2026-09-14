@@ -40,7 +40,7 @@ export const ITEMS = [
     priorite: 'S+',
     lieu: 'ombreterre',
     source:
-      'Assemblé à partir de trois composants : Icy Crystal (Filro l’Oublié, près de l’arbre Sussur), Icy Helve (Dhourn, à l’ouest de l’avant-poste sélûnite), Icy Metal (Xargrim, zone secrète de la colonie myconide).',
+      'Assemblé à partir de trois composants : Icy Crystal (Filro l’Oublié, près de l’arbre Sussur), Icy Helve (Dhourn, à l’ouest de l’avant-poste selûnite), Icy Metal (Xargrim, zone secrète de la colonie myconide).',
     wiki: wiki('Mourning_Frost'),
     note: 'Froid insidieux : les dégâts de froid appliquent Chilled. C’est LA source de Chilled du build, et sans Chilled il n’y a ni Gelé ni fenêtre tonnerre. Il donne aussi le sort mineur Ray of Frost gratuitement et +1 aux dégâts de froid. Combiner les trois pièces dans un seul inventaire.',
   },
@@ -424,6 +424,18 @@ export const ITEMS = [
     source: 'Vendue par Entharl Danthelon, à la Traversée du Wyrm.',
     wiki: wiki('Cloak_of_Displacement'),
     note: 'Désavantage aux attaques adverses tant que Baptiste n’a pas encaissé de dégâts ce tour : un vrai filet défensif pour un occultiste qui se bat au contact, pas seulement une option de secours.',
+  },
+  {
+    id: 'auntie-ethels-hair',
+    nom: 'Auntie Ethel’s Hair',
+    slot: 'Consommable',
+    acte: 1,
+    personnage: 'baptiste-hexblade-spores',
+    priorite: 'S+',
+    lieu: 'antre-ethel',
+    source: 'Réduire Ethel sous 20 % de PV dans son Antre Ancien (Marais Ensoleillé) puis accepter de négocier sa vie au lieu de l’achever.',
+    wiki: wiki('Auntie_Ethel%27s_Hair'),
+    note: 'Consommable à usage unique : +1 permanent à la caractéristique choisie. Exemplaire unique dans le jeu, comme Birthright pour le Sidekick — c’est la pièce qui porte le CHA de Baptiste de 17 (création) à 18, avant que l’ASI d’Occultiste 4 ne le pousse à 20.',
   },
 
   // ================================================================
