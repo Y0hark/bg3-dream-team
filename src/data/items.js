@@ -12,7 +12,7 @@
 // communautaire, et le vocabulaire utilisé par la communauté.
 //
 // Passe de vérification : chaque source ET chaque effet ont été relus sur
-// bg3.wiki. Les `note` décrivent l'effet réel de l'objet, pas celui qu'on
+// bg3.wiki. Les `note` décrivent l’effet réel de l’objet, pas celui qu’on
 // croit se rappeler — plusieurs entrées ont été corrigées à cette occasion
 // (Hat of Storm Scion's Power, The Dead Shot, Armour of Persistence,
 // Ring of Regeneration, Amulet of the Harpers).
@@ -21,7 +21,7 @@
 /** Ordre d'affichage des priorités, du plus critique au plus accessoire. */
 export const PRIORITES = ['S+', 'S', 'A', 'B']
 
-const wiki = (page) => `{{https://bg3.wiki/wiki/${page}}}`
+const wiki = (page) => `https://bg3.wiki/wiki/${page}`
 
 export const ITEMS = [
   // ================================================================
@@ -673,7 +673,7 @@ export const ITEMS = [
     lieu: 'grotte-ebonlake',
     source: 'Vendue par Derryth Bonecloak, à la grotte d’Ébènelac (aussi dans une réserve privée de la Maison des Comptes en Acte III).',
     wiki: wiki('Amulet_of_Restoration'),
-    note: 'Mot de guérison et Mot de guérison de groupe une fois par repos long chacun, hors emplacements : deux déclencheurs gratuits des Hellrider’s Pride et du Whispering Promise, en plus des Mots lancés sur emplacement.',
+    note: 'Mot de guérison et Mot de guérison de groupe une fois par repos long chacun, hors emplacements : un déclencheur gratuit de plus qui vient s’ajouter à la synergie du Whispering Promise, en plus des Mots lancés sur emplacement.',
   },
   {
     id: 'blood-of-lathander',
