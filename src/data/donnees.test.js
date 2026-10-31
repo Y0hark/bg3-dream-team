@@ -10,6 +10,17 @@ import {
   totauxClasses,
 } from '../lib/niveaux.js'
 import { ITEMS, PRIORITES, itemDe } from './items.js'
+import { ITEMS_ANCIENS } from './items-anciens.js'
+import { OBJETS, SLOTS_OBJET, objetDe } from './objets.js'
+import {
+  LIMITES_SLOTS,
+  LOADOUTS,
+  RANGS,
+  SLOTS_LOADOUT,
+  SLOTS_REQUIS,
+  STYLES_ROLES,
+  loadoutsDe,
+} from './loadouts.js'
 import { LIEUX, lieuDe } from './lieux.js'
 import { CHECKLISTS } from './checklists.js'
 import { ACCENTS } from '../lib/accents.js'
@@ -452,46 +463,266 @@ describe('items', () => {
     }
   })
 
-  it('couvre chaque personnage catalogué et chaque acte', () => {
-    // Le catalogue d'items est encore celui de l'ancienne composition : il est
-    // refait pour les rôles actifs dans le ticket loadouts (2/4).
-    for (const build of BUILDS_ANCIENS) {
-      expect(ITEMS.some((item) => item.personnage === build.id)).toBe(true)
+  it('couvre chaque rôle actif et chaque acte', () => {
+    for (const build of BUILDS) {
+      expect(ITEMS.some((item) => item.personnage === build.id), build.id).toBe(true)
+      expect(LOADOUTS.some((ligne) => ligne.role === build.id), build.id).toBe(true)
     }
     for (const numero of NUMEROS_ACTES) {
       expect(ITEMS.some((item) => item.acte === numero)).toBe(true)
     }
   })
 
-  it('portent tous une source et un lien wiki', () => {
-    // Le catalogue est encodé depuis les fiches bg3.wiki : une entrée sans
-    // source ni lien serait de la mémoire, pas une donnée vérifiée.
+  it('portent tous une source ; le lien wiki est une URL bg3.wiki ou null explicite', () => {
+    // Pas d'URL construite au hasard : une fiche sans lien porte null.
     for (const item of ITEMS) {
       expect(item.source?.length, `source manquante pour ${item.id}`).toBeGreaterThan(0)
-      expect(item.wiki, `wiki manquant pour ${item.id}`).toMatch(/^https:\/\/bg3\.wiki\/wiki\/\S+$/)
-    }
-  })
-
-  it('couvrent tous les slots portables de chaque personnage', () => {
-    // Le loadout n'est utile que s'il est complet : un slot oublié, c'est un
-    // emplacement joué vide pendant toute la run.
-    const REQUIS = ['Casque', 'Cape', 'Armure', 'Gants', 'Bottes', 'Amulette', 'Anneau']
-    for (const build of BUILDS_ANCIENS) {
-      const slots = new Set(
-        ITEMS.filter((item) => item.personnage === build.id).map((item) => item.slot),
-      )
-      for (const slot of REQUIS) {
-        expect(slots, `${build.id} n’a rien au slot ${slot}`).toContain(slot)
-      }
-      expect([...slots].some((slot) => slot.startsWith('Arme')), `${build.id} n’a pas d’arme`).toBe(
-        true,
-      )
+      if (item.wiki !== null) expect(item.wiki, item.id).toMatch(/^https:\/\/bg3\.wiki\/wiki\/\S+$/)
     }
   })
 
   it('résout un identifiant connu', () => {
     expect(itemDe('markoheshkir')?.nom).toBe('Markoheshkir')
     expect(itemDe('inconnu')).toBeNull()
+  })
+})
+
+describe('catalogue canonique (objets)', () => {
+  const normalise = (nom) => nom.toLowerCase().replace(/[’']/g, '').replace(/\s+/g, ' ').trim()
+
+  it('a des IDs uniques et aucun doublon d’orthographe entre apostrophes', () => {
+    expect(doublons(OBJETS.map((objet) => objet.id))).toEqual([])
+    expect(doublons(OBJETS.map((objet) => normalise(objet.nom)))).toEqual([])
+  })
+
+  it('préserve l’ID d’un objet déjà catalogué quand c’est le même objet', () => {
+    // Même nom que dans l'ancien catalogue = même objet = même ID : c'est ce
+    // qui conserve la progression des sauvegardes existantes.
+    const parNom = new Map(OBJETS.map((objet) => [normalise(objet.nom), objet.id]))
+    let conserves = 0
+    for (const ancien of ITEMS_ANCIENS) {
+      const id = parNom.get(normalise(ancien.nom))
+      if (id === undefined) continue
+      expect(id, `${ancien.nom} a changé d’ID`).toBe(ancien.id)
+      conserves += 1
+    }
+    expect(conserves).toBeGreaterThan(20)
+    // Un autre objet de nom proche n'usurpe pas l'ancien ID.
+    expect(objetDe('real-sparky-sparkswall')).toBeNull()
+    expect(objetDe('protecty-sparkswall')).not.toBeNull()
+  })
+
+  it('sépare la définition, les sources et l’emploi', () => {
+    for (const objet of OBJETS) {
+      expect(SLOTS_OBJET, objet.id).toContain(objet.slot)
+      expect(objet.effet.length, objet.id).toBeGreaterThan(0)
+      expect(objet.sources.length, `${objet.id} sans source`).toBeGreaterThan(0)
+      expect(objet, objet.id).not.toHaveProperty('personnage')
+      expect(objet, objet.id).not.toHaveProperty('rang')
+    }
+  })
+
+  it('décrit chaque source : acte, lieu existant ou null explicite, verrou connu', () => {
+    const VERROUS = ['aucun', 'quete', 'pnj', 'zone-dangereuse', 'point-de-non-retour', 'ressource-unique']
+    for (const objet of OBJETS) {
+      for (const source of objet.sources) {
+        expect(NUMEROS_ACTES, objet.id).toContain(source.acte)
+        expect(VERROUS, objet.id).toContain(source.verrou)
+        expect(source.texte.length, objet.id).toBeGreaterThan(0)
+        if (source.lieu === null) {
+          // Un emplacement non catalogué est dit « à confirmer », pas inventé.
+          expect(source.aConfirmer, `${objet.id} sans lieu doit porter aConfirmer`).toBe(true)
+        } else {
+          const lieu = lieuDe(source.lieu)
+          expect(lieu, `lieu inconnu pour ${objet.id}`).not.toBeNull()
+          expect(lieu.acte, `${objet.id} est rangé dans un lieu d’un acte postérieur`).toBeLessThanOrEqual(
+            source.acte,
+          )
+        }
+      }
+    }
+  })
+
+  it('prévoit un rattrapage seulement après une source principale', () => {
+    for (const objet of OBJETS) {
+      expect(objet.sources[0].rattrapage, objet.id).toBe(false)
+    }
+    const chapeau = objetDe('hat-of-fire-acuity')
+    expect(chapeau.sources).toHaveLength(2)
+    expect(chapeau.sources[0].verrou).toBe('pnj')
+    expect(chapeau.sources[1].rattrapage).toBe(true)
+  })
+
+  it('n’utilise que des liens wiki bg3.wiki en https, ou null', () => {
+    for (const objet of OBJETS) {
+      if (objet.wiki !== null) expect(objet.wiki, objet.id).toMatch(/^https:\/\/bg3\.wiki\/wiki\/\S+$/)
+    }
+  })
+
+  it('ne laisse aucun objet orphelin : tout objet est employé par au moins un rôle', () => {
+    for (const objet of OBJETS) {
+      expect(LOADOUTS.some((ligne) => ligne.objet === objet.id), `${objet.id} jamais recommandé`).toBe(true)
+    }
+  })
+
+  it('traite le Cheveu et les élixirs comme non copiables', () => {
+    for (const id of ['auntie-ethels-hair', 'elixir-hill-giant-strength', 'elixir-cloud-giant-strength']) {
+      expect(objetDe(id).copiable, id).toBe(false)
+    }
+    expect(objetDe('cloak-of-protection').copiable).toBe(true)
+  })
+})
+
+describe('loadouts par acte', () => {
+  const ROLES = BUILDS.map((build) => build.id)
+
+  it('ne référencent que des rôles actifs, des slots, des rangs et des objets existants', () => {
+    for (const ligne of LOADOUTS) {
+      const clef = `${ligne.role}/a${ligne.acte}/${ligne.slot}/${ligne.objet}`
+      expect(ROLES, clef).toContain(ligne.role)
+      expect(NUMEROS_ACTES, clef).toContain(ligne.acte)
+      expect(SLOTS_LOADOUT, clef).toContain(ligne.slot)
+      expect(RANGS, clef).toContain(ligne.rang)
+      expect(ligne.interet.length, clef).toBeGreaterThan(0)
+      if (ligne.jusquA !== null) expect(ligne.jusquA, clef).toBeGreaterThanOrEqual(ligne.acte)
+      if (ligne.objet === null) {
+        // Un slot libre est un choix assumé, pas un trou : toujours principal.
+        expect(ligne.rang, clef).toBe('principal')
+      } else {
+        expect(objetDe(ligne.objet), `objet orphelin ${clef}`).not.toBeNull()
+        expect(objetDe(ligne.objet).slot, clef).toBe(ligne.slot)
+      }
+    }
+  })
+
+  it('couvre les trois actes avec tous les slots requis pour chacun des quatre rôles', () => {
+    for (const role of ROLES) {
+      for (const acte of NUMEROS_ACTES) {
+        const slots = new Set(
+          loadoutsDe(role, acte)
+            .filter((ligne) => ligne.rang === 'principal')
+            .map((ligne) => ligne.slot),
+        )
+        for (const slot of SLOTS_REQUIS) {
+          expect(slots, `${role} acte ${acte} : rien au slot ${slot}`).toContain(slot)
+        }
+      }
+    }
+  })
+
+  it('n’équipe jamais plus que les limites de slots en rang principal', () => {
+    // Une amulette, une cape, deux anneaux par personnage — copies ou pas.
+    for (const role of ROLES) {
+      for (const acte of NUMEROS_ACTES) {
+        const compte = {}
+        for (const ligne of loadoutsDe(role, acte).filter((l) => l.rang === 'principal' && l.objet)) {
+          compte[ligne.slot] = (compte[ligne.slot] ?? 0) + 1
+        }
+        for (const [slot, nombre] of Object.entries(compte)) {
+          expect(nombre, `${role} acte ${acte} : ${slot}`).toBeLessThanOrEqual(LIMITES_SLOTS[slot])
+        }
+      }
+    }
+    expect(LIMITES_SLOTS.Amulette).toBe(1)
+    expect(LIMITES_SLOTS.Cape).toBe(1)
+    expect(LIMITES_SLOTS.Anneau).toBe(2)
+  })
+
+  it('ne répète pas un même objet sur un même slot, rôle et acte', () => {
+    for (const role of ROLES) {
+      for (const acte of NUMEROS_ACTES) {
+        const cles = loadoutsDe(role, acte)
+          .filter((ligne) => ligne.objet)
+          .map((ligne) => `${ligne.slot}/${ligne.objet}`)
+        expect(doublons(cles), `${role} acte ${acte}`).toEqual([])
+      }
+    }
+  })
+
+  it('ne recommande un objet qu’à partir de l’acte où une source existe', () => {
+    for (const ligne of LOADOUTS.filter((entree) => entree.objet)) {
+      const premier = Math.min(...objetDe(ligne.objet).sources.map((source) => source.acte))
+      expect(ligne.acte, `${ligne.role}/${ligne.objet}`).toBeGreaterThanOrEqual(premier)
+    }
+  })
+
+  it('n’emprunte un bonus offensif qu’aux types de dégâts que le rôle fait vraiment', () => {
+    // Caustic Band, Strange Conduit, Broodmother : des bonus d'arme. Jamais
+    // des bonus aux poings du Moine ni aux sorts du Sorcier.
+    for (const ligne of LOADOUTS.filter((entree) => entree.objet && entree.rang === 'principal')) {
+      const { offensif } = objetDe(ligne.objet)
+      if (offensif === null) continue
+      expect(
+        offensif.some((type) => STYLES_ROLES[ligne.role].includes(type)),
+        `${ligne.role} acte ${ligne.acte} : ${ligne.objet} ne vaut pas pour ${STYLES_ROLES[ligne.role]}`,
+      ).toBe(true)
+    }
+    for (const id of ['caustic-band', 'strange-conduit-ring', 'broodmothers-revenge']) {
+      expect(objetDe(id).offensif, id).toEqual(['arme'])
+      const roles = LOADOUTS.filter((ligne) => ligne.objet === id).map((ligne) => ligne.role)
+      expect(roles, id).not.toContain('moine-main-ouverte')
+      expect(roles, id).not.toContain('sorcier-feu')
+    }
+  })
+
+  it('garde le Moine à mains libres : ni arme ni bouclier en principal', () => {
+    const lignes = LOADOUTS.filter((ligne) => ligne.role === 'moine-main-ouverte' && ligne.rang === 'principal')
+    expect(lignes.filter((ligne) => ligne.slot === 'Arme').every((ligne) => ligne.objet === null)).toBe(true)
+    expect(lignes.some((ligne) => ligne.slot === 'Bouclier')).toBe(false)
+  })
+
+  it('met les bottes Kushigo en priorité du Moine à l’acte III, sans les imposer aux autres rôles', () => {
+    const moine = loadoutsDe('moine-main-ouverte', 3).find((l) => l.slot === 'Bottes' && l.rang === 'principal')
+    expect(moine.objet).toBe('boots-uninhibited-kushigo')
+    expect(
+      LOADOUTS.filter((ligne) => ligne.objet === 'boots-uninhibited-kushigo').map((ligne) => ligne.role),
+    ).toEqual(['moine-main-ouverte'])
+    const kushigo = objetDe('boots-uninhibited-kushigo')
+    expect(kushigo.critique).toBe(true)
+    expect(kushigo.sources[0].verrou).toBe('point-de-non-retour')
+    expect(kushigo.sources[0].lieu).toBe('plan-astral')
+  })
+
+  it('réserve le Cheveu au Sorcier', () => {
+    const roles = LOADOUTS.filter((ligne) => ligne.objet === 'auntie-ethels-hair').map((ligne) => ligne.role)
+    expect(roles).toEqual(['sorcier-feu'])
+  })
+
+  it('n’emploie pas la Pearl ou Spellcrux comme amulette de combat principale', () => {
+    // Amulettes de récupération : réserve, pas le slot de combat.
+    for (const id of ['pearl-of-power-amulet', 'spellcrux-amulet', 'sentient-amulet-rare']) {
+      const rangs = LOADOUTS.filter((ligne) => ligne.objet === id).map((ligne) => ligne.rang)
+      expect(new Set(rangs), id).toEqual(new Set(['reserve']))
+    }
+  })
+
+  it('n’emploie Hat of Fire Acuity que pour le Sorcier et jamais avec Pyroquickness', () => {
+    const roles = LOADOUTS.filter((ligne) => ligne.objet === 'hat-of-fire-acuity').map((ligne) => ligne.role)
+    expect(new Set(roles)).toEqual(new Set(['sorcier-feu']))
+    expect(
+      LOADOUTS.find((ligne) => ligne.objet === 'pyroquickness-hat').rang,
+    ).toBe('situationnel')
+  })
+
+  it('partage Night Walkers entre rôles (copies) sans écraser Kushigo chez le Moine', () => {
+    const roles = (id) => new Set(LOADOUTS.filter((ligne) => ligne.objet === id).map((ligne) => ligne.role))
+    // Night Walkers peut servir à plusieurs joueurs (copies)…
+    expect(roles('disintegrating-night-walkers').size).toBeGreaterThan(1)
+    // … mais au Moine il ne remplace pas Kushigo à l'acte III.
+    const moineActe3 = loadoutsDe('moine-main-ouverte', 3).filter((l) => l.slot === 'Bottes')
+    expect(moineActe3.find((l) => l.objet === 'disintegrating-night-walkers').rang).toBe('alternative')
+  })
+
+  it('borne le Death Ward de Reviving Hands à la résurrection, pas à un simple soin', () => {
+    const reviving = objetDe('reviving-hands')
+    expect(reviving.effet).toMatch(/Mot de guérison sur un allié à terre n’est pas une résurrection/)
+    const sidekickActe3 = loadoutsDe('sidekick-savoir-vie', 3).find((l) => l.objet === 'reviving-hands')
+    expect(sidekickActe3.condition).toMatch(/ne donne pas Death Ward/)
+  })
+
+  it('signale la perte de valeur fixée avant de retirer Greater Health', () => {
+    expect(objetDe('amulet-greater-health').effet).toMatch(/Fixe la CON à 23/)
+    expect(objetDe('amulet-greater-health').effet).toMatch(/dangereux/)
   })
 })
 

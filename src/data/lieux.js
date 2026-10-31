@@ -132,6 +132,15 @@ export const LIEUX = [
     carte: CARTE_ACTE_I,
   },
 
+  {
+    id: 'marais-ensoleille',
+    nom: 'Marais Ensoleillé',
+    acte: 1,
+    resume: 'Sanctuaire décrépit : coffre au pied de la grosse souche, The Sparkle Hands.',
+    wiki: wiki('Sunlit_Wetlands'),
+    carte: CARTE_ACTE_I,
+  },
+
   // --------------------------------------------------------------- Acte II
   {
     id: 'auberge-derniere-lumiere',
@@ -158,6 +167,14 @@ export const LIEUX = [
     carte: CARTE_ACTE_II,
   },
   {
+    id: 'reithwin',
+    nom: 'Reithwin (Maison de guérison)',
+    acte: 2,
+    resume: 'Bourg maudit des Terres Maudites : Malus Thorm et la Maison de guérison (Surgeon’s Subjugation Amulet).',
+    wiki: wiki('Reithwin_Town'),
+    carte: CARTE_ACTE_II,
+  },
+  {
     id: 'temple-shar',
     nom: 'Épreuves de Shar (Gantelet)',
     acte: 2,
@@ -167,6 +184,22 @@ export const LIEUX = [
   },
 
   // -------------------------------------------------------------- Acte III
+  {
+    id: 'plan-astral',
+    nom: 'Plan astral (transition vers l’Acte III)',
+    acte: 3,
+    resume: 'Le prélat Lir’i’c porte les Boots of Uninhibited Kushigo : à ramasser avant de repartir, on ne revient pas.',
+    wiki: wiki('Astral_Plane'),
+    carte: null,
+  },
+  {
+    id: 'rivington',
+    nom: 'Rivington',
+    acte: 3,
+    resume: 'Ferg Drogher, près de la grange réquisitionnée : Hellrider Longbow et Robe of Supreme Defences. Sécuriser le commerce avant les dialogues qui peuvent le fermer.',
+    wiki: wiki('Rivington'),
+    carte: CARTE_ACTE_III,
+  },
   {
     id: 'basse-ville',
     nom: 'Basse-Ville',
@@ -273,11 +306,11 @@ export const LIEUX = [
   },
   {
     id: 'grand-mausolee',
-    nom: 'Grand Mausolée',
-    acte: 3,
-    resume: 'Coffre de voyageur verrouillé dans l’angle sud-est : Vivacious Cloak.',
+    nom: 'Grand Mausolée (Reithwin)',
+    acte: 2,
+    resume: 'Coffre de voyageur verrouillé dans l’angle sud-est : Vivacious Cloak. Le Grand Mausolée est à Reithwin, en Acte II.',
     wiki: wiki('Grand_Mausoleum'),
-    carte: CARTE_ACTE_III,
+    carte: CARTE_ACTE_II,
   },
   {
     id: 'tribunal-du-meurtre',
