@@ -52,7 +52,8 @@ export const LIMITES_SLOTS = {
   Amulette: 1,
   Anneau: 2,
   'Arme à distance': 1,
-  Consommable: 2,
+  // Un seul élixir actif à la fois ; le Cheveu est un bonus permanent, pas un élixir.
+  Consommable: 1,
 }
 
 /** Slots qu'un loadout complet doit couvrir à chaque acte (objet ou « libre »). */

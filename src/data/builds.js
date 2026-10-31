@@ -160,7 +160,7 @@ export const BUILDS = [
         dons: 2,
         gains: ['Commandement basé sur le CHA, sans concentration, lançable à un niveau supérieur avec les emplacements du Sorcier', 'Maîtrise des armures légères', 'Sorts de Sorcier de niveau 6 conservés'],
         pertes: ['Le don de Sorcier 12', 'Un point de sorcellerie de base', 'Le niveau d’Occultiste n’ajoute pas de niveau de lanceur aux emplacements du Sorcier'],
-        verdict: 'Variante de très haut plafond dégâts + contrôle, à préférer si le Sorcier doit verrouiller le combat tout en maintenant Hâte. Ce n’est pas un Sorlock à deux niveaux d’Occultiste.',
+        verdict: 'Variante de très haut plafond dégâts + contrôle, à préférer si le Sorcier doit verrouiller le combat tout en maintenant Hâte. Ce n’est pas la variante à deux niveaux d’Occultiste centrée sur Décharge occulte.',
         cumulAvecPrincipal: false,
       },
       {

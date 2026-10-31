@@ -6,6 +6,7 @@
 // ------------------------------------------------------------------
 import { ACTES } from '../data/actes.js'
 import { buildDe } from '../data/builds.js'
+import { estRequise } from '../data/checklists.js'
 import { PRIORITES } from '../data/items.js'
 import { LOADOUTS, loadoutsDe } from '../data/loadouts.js'
 import { objetDe } from '../data/objets.js'
@@ -299,13 +300,24 @@ export function grouperParActe(items) {
   })).filter((groupe) => groupe.items.length > 0)
 }
 
-/** Comptage d'une checklist : cases cochées sur total, et acte validé ou non. */
+/**
+ * Comptage d'une checklist : cases cochées sur total, et acte validé ou non.
+ * Seules les entrées OBLIGATOIRES comptent dans le dénominateur : un acte ne
+ * se bloque pas sur des variantes, rattrapages ou options facultatives, que
+ * `optionnelles` / `optionnellesCochees` comptent à part.
+ */
 export function compterChecklist(checklist, etat) {
-  const total = checklist?.entrees?.length ?? 0
-  const coches = (checklist?.entrees ?? []).filter((entree) => etat?.checklist?.[entree.id]).length
+  const entrees = checklist?.entrees ?? []
+  const requises = entrees.filter(estRequise)
+  const facultatives = entrees.filter((entree) => !estRequise(entree))
+  const cochee = (entree) => Boolean(etat?.checklist?.[entree.id])
+  const total = requises.length
+  const coches = requises.filter(cochee).length
   return {
     coches,
     total,
+    optionnelles: facultatives.length,
+    optionnellesCochees: facultatives.filter(cochee).length,
     complet: total > 0 && coches === total,
     pourcentage: total === 0 ? 0 : Math.round((coches / total) * 100),
   }

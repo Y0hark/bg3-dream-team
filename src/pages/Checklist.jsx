@@ -4,9 +4,13 @@ import EnteteSection from '../components/EnteteSection.jsx'
 import Revelation from '../components/Revelation.jsx'
 import { BadgeActe } from '../components/Badges.jsx'
 import { acteDe } from '../data/actes.js'
+import { buildDe } from '../data/builds.js'
 import { CHECKLISTS } from '../data/checklists.js'
 import { ITEMS } from '../data/items.js'
-import { compter, compterChecklist } from '../lib/progression.js'
+import { lieuDe } from '../data/lieux.js'
+import { objetDe } from '../data/objets.js'
+import { RISQUES } from '../data/risques.js'
+import { compter, compterChecklist, itemsDuPlan } from '../lib/progression.js'
 import useProgression from '../hooks/useProgression.jsx'
 
 export default function Checklist() {
@@ -18,7 +22,7 @@ export default function Checklist() {
         checklist,
         ...compterChecklist(checklist, etat),
         items: compter(
-          ITEMS.filter((item) => item.acte === checklist.acte),
+          itemsDuPlan(ITEMS).filter((item) => item.acte === checklist.acte),
           etat,
         ),
       })),
@@ -34,7 +38,7 @@ export default function Checklist() {
       />
 
       <div className="space-y-6">
-        {parActe.map(({ checklist, coches, total, complet, pourcentage, items }, index) => {
+        {parActe.map(({ checklist, coches, total, complet, pourcentage, items, optionnelles, optionnellesCochees }, index) => {
           const acte = acteDe(checklist.acte)
 
           return (
@@ -59,8 +63,8 @@ export default function Checklist() {
 
                 <div className="w-full max-w-xs space-y-3">
                   <BarreProgression
-                    libelle="Checklist"
-                    detail={`${coches}/${total}`}
+                    libelle="Obligatoires"
+                    detail={`${coches}/${total} · ${optionnellesCochees}/${optionnelles} facultatives`}
                     pourcentage={pourcentage}
                     teinte={complet ? 'bg-emerald-400/80' : 'bg-or-300/80'}
                   />
@@ -88,8 +92,35 @@ export default function Checklist() {
                           checked={coche}
                           onChange={() => basculerChecklist(entree.id)}
                         />
-                        <span className={`text-sm leading-relaxed ${coche ? 'line-through' : ''}`}>
-                          {entree.texte}
+                        <span className="min-w-0">
+                          <span className={`text-sm leading-relaxed ${coche ? 'line-through' : ''}`}>
+                            {entree.texte}
+                          </span>
+                          <span className="mt-1 block text-xs leading-relaxed text-gray-500">
+                            <span className={`mr-2 font-rune uppercase tracking-[0.12em] ${entree.priorite === 'obligatoire' ? 'text-amber-200' : 'text-gray-400'}`}>
+                              {entree.priorite}
+                            </span>
+                            {entree.moment === 'transition' && (
+                              <span className="mr-2 font-rune uppercase tracking-[0.12em] text-red-300">Transition</span>
+                            )}
+                            {entree.raison}
+                            {entree.roles?.length > 0 && (
+                              <span className="ml-2 text-gray-400">
+                                · {entree.roles.map((role) => buildDe(role)?.personnage).filter(Boolean).join(', ')}
+                              </span>
+                            )}
+                            {entree.objet && objetDe(entree.objet) && (
+                              <span className="ml-2 text-gray-400">· {objetDe(entree.objet).nom}</span>
+                            )}
+                            {entree.lieu && lieuDe(entree.lieu) && (
+                              <span className="ml-2 text-gray-400">· {lieuDe(entree.lieu).nom}</span>
+                            )}
+                          </span>
+                          {entree.alternative && (
+                            <span className="mt-1 block text-xs leading-relaxed text-sky-200/80">
+                              Alternative : {entree.alternative}
+                            </span>
+                          )}
                         </span>
                       </label>
                     </li>
@@ -100,6 +131,28 @@ export default function Checklist() {
           )
         })}
       </div>
+
+      <section className="mt-14" aria-labelledby="titre-risques">
+        <h2 id="titre-risques" className="grave text-xl tracking-[0.1em]">
+          Risques Honneur de la composition
+        </h2>
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-gray-400">
+          Garde-fous recopiés des fiches : ce que la nouvelle équipe ne doit pas hériter de l’ancienne ou d’un guide de table.
+          Documenté, pas testé en jeu.
+        </p>
+        <ul className="mt-4 grid gap-3 md:grid-cols-2">
+          {RISQUES.map((risque) => (
+            <li key={risque.id} className="plaque px-5 py-4 text-sm leading-relaxed text-gray-300">
+              <span
+                className={`mr-2 font-rune text-[0.62rem] uppercase tracking-[0.14em] ${risque.gravite === 'bloquant' ? 'text-red-300' : 'text-amber-200'}`}
+              >
+                {risque.gravite}
+              </span>
+              {risque.texte}
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   )
 }

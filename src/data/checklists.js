@@ -1,53 +1,225 @@
-// Checklists de fin d'acte : ce qui doit être vrai avant de franchir un point
-// de non-retour. En Honneur, une seule sauvegarde — l'oubli ne se rattrape pas.
+// ------------------------------------------------------------------
+// Checklists de la run Honneur V2 : ce qui doit être vrai avant de franchir
+// chaque point de non-retour, pour Sorcier feu, Paladin, Moine et Sidekick.
+// Recopiées des sections « Checklist » des quatre fiches Notion ; aucune
+// entrée de l'ancienne composition n'a été reprise (leurs cases cochées, si
+// elles existent, sont archivées par la migration).
+//
+// Chaque entrée porte un ID stable, l'acte, les rôles concernés, une
+// priorité, un objet et/ou un lieu quand il y en a un, et surtout la RAISON
+// de ne pas attendre :
+//   - obligatoire : nécessaire au plan ; conditionne la validation de l'acte ;
+//   - rattrapable : une seconde chance existe, mais plus chère ;
+//   - optionnel : confort ou variante ; ne bloque jamais un acte ;
+//   - alternative : l'objet est une option parmi d'autres (jamais bloquante).
+//
+// Une entrée obligatoire liée à un objet critique doit documenter une
+// `alternative` : un objet raté n'affiche pas une run entière comme perdue.
+// ------------------------------------------------------------------
+
+export const PRIORITES_ENTREE = ['obligatoire', 'rattrapable', 'optionnel', 'alternative']
+
+const e = (id, priorite, texte, raison, options = {}) => ({
+  id,
+  priorite,
+  texte,
+  raison,
+  roles: options.roles ?? [],
+  objet: options.objet ?? null,
+  lieu: options.lieu ?? null,
+  alternative: options.alternative ?? null,
+  moment: options.moment ?? null,
+  // Vrai quand l'action précède l'obtention (ex. laisser un PNJ vivre en Acte I
+  // pour recevoir l'objet en Acte II).
+  anticipation: options.anticipation ?? false,
+})
+
+const SORCIER = 'sorcier-feu'
+const PALADIN = 'paladin-hexblade'
+const MOINE = 'moine-main-ouverte'
+const SIDEKICK = 'sidekick-savoir-vie'
+
 export const CHECKLISTS = [
   {
     acte: 1,
     titre: 'Avant de descendre à Grymforge et de quitter l’Acte I',
     entrees: [
-      { id: 'a1-niveau', texte: 'Toute l’équipe est niveau 5 avant le point de non-retour.' },
-      { id: 'a1-adamantine', texte: 'Forge adamantine : les deux veines de mithral du Refuge abandonné sont coulées — armure pour Sam, bouclier pour le Sidekick.' },
-      { id: 'a1-zhent', texte: 'Brem débloqué (« Retrouver la cargaison disparue ») et le Titanstring Bow acheté avant de quitter la zone.' },
-      { id: 'a1-marchands', texte: 'Les marchands de l’Acte I ont été rachetés avant de partir.' },
-      { id: 'a1-creche', texte: 'Crèche Y’llek écumée : chambre de l’Inquisiteur (Gloves of Belligerent Skies, Diadem of Arcane Synergy, Strange Conduit Ring) et The Blood of Lathander.' },
-      { id: 'a1-gel', texte: 'Chaîne du gel de Sam montée : Mourning Frost assemblé (3 pièces dans l’Ombreterre) ET Winter’s Clutches achetés chez Lady Esther — sans les deux, Gelé ne dure pas un tour.' },
-      { id: 'a1-phalar', texte: 'Porteur de Phalar Aluve désigné : la main de Sam est prise par Mourning Frost, donc le Sidekick par défaut.' },
-      { id: 'a1-statstick', texte: 'Club of Hill Giant Strength récupéré à la tour arcanique et équipé en main de mêlée sur Lilian : le Titanstring ne vaut rien sans.' },
-      { id: 'a1-camp', texte: 'Stock de camp : flèches, potions de soin majeures, parchemins de Rappel à la vie, et un stock d’élixirs de Force de géant des collines — le Titanstring de Lilian ne vaut rien sans.' },
-      { id: 'a1-cheveu', texte: 'Cheveu de la mégère (Tante Ethel) : Baptiste ne dépend plus d’un point de CHA externe, son unique ASI suffit à porter 16 → 18. À garder en réserve pour le Sidekick si sa propre ligne de charisme en profite.' },
-      { id: 'a1-respec', texte: 'Les respec de mi-parcours sont faits (Withers) : plus cher plus tard.' },
+      e('v2-a1-elixirs', 'obligatoire',
+        'Stock d’élixirs de Force chez Ethel acheté AVANT la résolution de sa quête.',
+        'Après l’avoir rendue hostile ou tuée, plus de vente : le Moine joue FOR 8 sans élixir.',
+        { roles: [MOINE], objet: 'elixir-hill-giant-strength', lieu: 'antre-ethel',
+          alternative: 'Variantes sans élixir de la fiche : DEX / SAG sans Tavern Brawler, ou Gauntlets of Hill Giant Strength en Acte III.' }),
+      e('v2-a1-cheveu', 'optionnel',
+        'Cheveu d’Ethel réservé au Sorcier (jamais au Paladin ni au Sidekick).',
+        'Ressource unique : les copies ne la dupliquent pas.',
+        { roles: [SORCIER], objet: 'auntie-ethels-hair', lieu: 'antre-ethel',
+          alternative: 'Route sans Cheveu : CHA 16 à la création, +2 aux niveaux 4 et 12 pour 20.' }),
+      e('v2-a1-spellsparkler', 'obligatoire',
+        'Sauver Florrick au Relais de Waukeen et prendre The Spellsparkler.',
+        'La récompense dépend de l’issue de la quête.',
+        { roles: [SORCIER], objet: 'the-spellsparkler', lieu: 'auberge-waukeen',
+          alternative: 'Melf’s First Staff chez Blurg (colonie myconide).' }),
+      e('v2-a1-boeuf', 'obligatoire',
+        'Laisser l’Étrange bœuf vivre au Bosquet d’Émeraude.',
+        'Le tuer à ce stade ne donne pas le Hat of Fire Acuity : il le porte en Acte II.',
+        { roles: [SORCIER], objet: 'hat-of-fire-acuity', lieu: 'bosquet-emeraude', anticipation: true,
+          alternative: 'Rattrapage à Rivington en Acte III si le bœuf y arrive vivant ; sinon Hood of the Weave ou Fistbreaker Helm.' }),
+      e('v2-a1-whispering-promise', 'obligatoire',
+        'Acheter The Whispering Promise (Volo) et vérifier l’inventaire.',
+        'Le moteur soin-buff sans concentration du Sidekick en dépend.',
+        { roles: [SIDEKICK], objet: 'whispering-promise', lieu: 'camp-gobelin',
+          alternative: 'Hellrider’s Pride protège déjà les alliés soignés ; Bénédiction du sort reste lançable avec concentration.' }),
+      e('v2-a1-hellriders-pride', 'obligatoire',
+        'Résoudre l’enquête sur Kagha pour obtenir Hellrider’s Pride auprès de Zevlor.',
+        'Pas besoin de massacrer le Bosquet pour obtenir ce moteur.',
+        { roles: [SIDEKICK], objet: 'hellriders-pride', lieu: 'bosquet-emeraude',
+          alternative: 'The Reviving Hands en Acte III reprend le rôle de gants de soin.' }),
+      e('v2-a1-creche', 'obligatoire',
+        'Écumer la Crèche Y’llek avant les choix qui la rendent hostile : Unseen Menace, Arcane Synergy.',
+        'Les marchands de la Crèche ne reviennent pas après leur bascule.',
+        { roles: [PALADIN], objet: 'unseen-menace', lieu: 'creche-yllek',
+          alternative: 'Sword of Justice (péage de la Route du Renouveau) ou une arme à deux mains achetée.' }),
+      e('v2-a1-arcane-synergy', 'optionnel',
+        'Récupérer Ring of Arcane Synergy (et, en option, Elemental Infusion) avant de quitter la Crèche.',
+        'Alternative offensive prioritaire pour Booming Blade : la zone ne se rouvre pas.',
+        { roles: [PALADIN], objet: 'ring-arcane-synergy', lieu: 'creche-yllek' }),
+      e('v2-a1-night-walkers', 'obligatoire',
+        'Sécuriser Disintegrating Night Walkers (Nere) sans précipiter les combats de Grymforge.',
+        'Mobilité et protections de déplacement pour trois rôles, par copie.',
+        { roles: [SORCIER, MOINE, SIDEKICK], objet: 'disintegrating-night-walkers', lieu: 'grymforge',
+          alternative: 'Boots of Speed (Thulla) ou Boots of Stormy Clamour (Omeluum).' }),
+      e('v2-a1-esther', 'obligatoire',
+        'Acheter The Graceful Cloth et Periapt of Wound Closure chez Lady Esther.',
+        'Elle ne reste pas fiable une fois le secteur hostile.',
+        { roles: [MOINE, PALADIN], objet: 'the-graceful-cloth', lieu: 'sentier-rosemorne',
+          alternative: 'Vêtements ordinaires en attendant ; Amulet of Misty Step en amulette de combat.' }),
+      e('v2-a1-sparkle-hands', 'optionnel',
+        'Prendre The Sparkle Hands (Marais Ensoleillé) ou Gloves of Cinder and Sizzle.',
+        'Gants de poings du Moine : choisir selon la cible, pas la rareté.',
+        { roles: [MOINE], objet: 'gloves-sparkle-hands', lieu: 'marais-ensoleille' }),
+      e('v2-a1-roah', 'optionnel',
+        'Acheter Bow of Awareness chez Roah avant de rendre le camp hostile.',
+        'Passif d’initiative, par copie pour plusieurs rôles.',
+        { roles: [SORCIER, MOINE, SIDEKICK], objet: 'bow-of-awareness', lieu: 'camp-gobelin' }),
+      e('v2-a1-copies', 'obligatoire',
+        'Valider les copies d’équipement sur deux personnages avant de compter sur un set partagé.',
+        'Passifs et persistance des copies sont à vérifier sur le hotfix installé ; Invocation de réplique demande le domaine de la Ruse.',
+        { alternative: 'Mode sans copies : le loadout affiche les arbitrages naturels, rien n’est perdu.' }),
     ],
   },
   {
     acte: 2,
     titre: 'Avant l’assaut des Tours d’Aubelune',
     entrees: [
-      { id: 'a2-niveau', texte: 'Équipe niveau 8 minimum, dons clés pris.' },
-      { id: 'a2-lumiere', texte: 'Sources de lumière contre les ténèbres maudites pour les 4 personnages.' },
-      { id: 'a2-marchands', texte: 'Marchands de l’Auberge de la Dernière Lumière et d’Aubelune écumés.' },
-      { id: 'a2-shar', texte: 'Épreuves de Shar terminées avant le point de non-retour.' },
-      { id: 'a2-araj', texte: 'Araj Oblodra rachetée à Aubelune : Risky Ring, Ring of Free Action, Hat of Storm Scion’s Power.' },
-      { id: 'a2-miroir', texte: 'Miroir des Pertes utilisé sur le CHA du Sidekick (Gantelet de Shar) : c’est lui qui rentabilise Birthright en Acte III.' },
-      { id: 'a2-repos', texte: 'Repos long pris juste avant l’assaut : toutes les ressources pleines.' },
-      { id: 'a2-concentration', texte: 'Plan de concentration validé : qui tient Hâte, qui tient le contrôle.' },
+      e('v2-a2-chapeau', 'obligatoire',
+        'Obtenir le Hat of Fire Acuity à l’Ultime Lueur sans mettre Dammon ni les PNJ alliés en danger.',
+        'Priorité absolue du Sorcier ; le combat doit être préparé.',
+        { roles: [SORCIER], objet: 'hat-of-fire-acuity', lieu: 'auberge-derniere-lumiere',
+          alternative: 'Fistbreaker Helm (Lann Tarv) maintenant, Hood of the Weave en Acte III, ou rattrapage à Rivington.' }),
+      e('v2-a2-talli', 'obligatoire',
+        'Acheter chez Talli : Cloak of Protection et Amulet of the Harpers.',
+        'Achats de survie pour les quatre rôles, à faire avant l’hostilité.',
+        { roles: [SORCIER, PALADIN, MOINE, SIDEKICK], objet: 'cloak-of-protection', lieu: 'auberge-derniere-lumiere',
+          alternative: 'Ring of Protection (quête de l’idole) et Cloak of Displacement en Acte III.' }),
+      e('v2-a2-boutiques', 'optionnel',
+        'Passer chez Dammon, Araj, Roah et Lann Tarv avant les bascules hostiles de l’Ultime Lueur et de Hautelune.',
+        'Free Action, Sentinel Shield, Darkfire Shortbow, Charge-Bound Warhammer : tout disparaît avec le vendeur.',
+        { roles: [PALADIN, MOINE, SIDEKICK], objet: 'ring-free-action', lieu: 'tours-aubelune' }),
+      e('v2-a2-spineshudder', 'obligatoire',
+        'Récupérer Spineshudder Amulet (mimique de l’ancienne chambre d’Isobel, pas celle de Ketheric).',
+        'Réverbération sur les attaques de sorts à distance : le moteur de Rayon ardent.',
+        { roles: [SORCIER], objet: 'spineshudder-amulet', lieu: 'tours-aubelune',
+          alternative: 'Amulet of the Harpers ou Spellcrux Amulet en réserve.' }),
+      e('v2-a2-spellcrux', 'optionnel',
+        'Prendre Spellcrux Amulet (gardienne de la prison de Hautelune) et l’amulette de Malus Thorm.',
+        'Réserve d’autonomie hors combat ; Surgeon’s Subjugation est une option de rencontre.',
+        { roles: [SORCIER, PALADIN, MOINE], objet: 'spellcrux-amulet', lieu: 'tours-aubelune' }),
+      e('v2-a2-anneaux', 'optionnel',
+        'Anneaux utiles du Sorcier : Callous Glow (Gantelet de Shar) et Coruscation (cave de l’Ultime Lueur).',
+        'Pièges mortels en Honneur ; à faire avant la fin du Gantelet.',
+        { roles: [SORCIER], objet: 'callous-glow-ring', lieu: 'temple-shar' }),
+      e('v2-a2-flawed-helldusk', 'rattrapable',
+        'Faire forger les Flawed Helldusk Gloves par Dammon (fer infernal).',
+        'Gants d’acte 2 du Paladin et du Moine ; la forge n’est pas disponible après la bascule.',
+        { roles: [PALADIN, MOINE], objet: 'flawed-helldusk-gloves', lieu: 'auberge-derniere-lumiere',
+          alternative: 'Gloves of the Growling Underdog, Sparkle Hands ou Cinder en attendant.' }),
+      e('v2-a2-killer', 'optionnel',
+        'Épreuve du dédoublement du Gantelet de Shar : Killer’s Sweetheart.',
+        'Critique préparé pour un gros Smite, une fois par repos long.',
+        { roles: [PALADIN], objet: 'killers-sweetheart', lieu: 'temple-shar' }),
+      e('v2-a2-prisonniers', 'obligatoire',
+        'Sauver les prisonniers et explorer avant les points de non-retour de la fin du Gantelet.',
+        'Tout ce qui n’est pas fait avant l’assaut des Tours est perdu.',
+        { lieu: 'tours-aubelune' }),
+      e('v2-a2-concentration', 'obligatoire',
+        'Plan de concentration validé : qui tient Hâte, qui tient le contrôle.',
+        'Une seule concentration par personnage ; la fin de Hâte provoque une Léthargie.',
+        { roles: [SORCIER, SIDEKICK] }),
     ],
   },
   {
     acte: 3,
-    titre: 'Avant les derniers combats',
+    titre: 'Transition vers l’Acte III et derniers combats',
     entrees: [
-      { id: 'a3-niveau', texte: 'Niveau 12 atteint avant le dernier acte du scénario.' },
-      { id: 'a3-sundries', texte: 'Markoheshkir récupéré à la tour de Ramazith (Voir l’invisible, puis Arcanes DD 20).' },
-      { id: 'a3-espoir', texte: 'Maison de l’Espoir terminée : Amulet of Greater Health, Staff of Spellpower et Helldusk Armour.' },
-      { id: 'a3-devout', texte: 'Amulet of the Devout récupérée au Tabernacle de Stormshore (+2 DD et une charge de Conduit divin) — prévoir un Retrait de malédiction pour celui qui pille le coffre d’offrandes.' },
-      { id: 'a3-baton', texte: 'Bâton de Sam tranché : Mourning Frost reste équipé tant que le combo Gelé est le plan, Markoheshkir seulement quand il ne l’est pas.' },
-      { id: 'a3-loadout', texte: 'Loadout final équipé et testé sur un combat de contrôle.' },
-      { id: 'a3-consommables', texte: 'Consommables de sécurité : élixirs, parchemins, potions de vitesse.' },
-      { id: 'a3-rates', texte: 'Aucun item S+ n’est marqué « Raté » sans remplacement prévu.' },
+      e('v2-a3-kushigo', 'obligatoire',
+        'Ramasser les Boots of Uninhibited Kushigo sur Lir’i’c au Plan astral avant de repartir.',
+        'On ne revient pas au Plan astral : sans elles, le Moine perd le modificateur de SAG à chaque frappe.',
+        { roles: [MOINE], objet: 'boots-uninhibited-kushigo', lieu: 'plan-astral', moment: 'transition',
+          alternative: 'Disintegrating Night Walkers : mobilité conservée, mais le bonus de SAG par frappe est perdu.' }),
+      e('v2-a3-ferg', 'optionnel',
+        'Acheter chez Ferg à Rivington avant toute interaction qui ferme son commerce.',
+        'Hellrider Longbow (+3 initiative) et Robe of Supreme Defences ; le parcours de Shadowheart peut bloquer.',
+        { roles: [SORCIER, PALADIN, MOINE, SIDEKICK], objet: 'hellrider-longbow', lieu: 'rivington',
+          alternative: 'Bow of Awareness ou Darkfire Shortbow.' }),
+      e('v2-a3-nyrulna', 'obligatoire',
+        'Récupérer Nyrulna dans le coffre de la jungle d’Akabi avec un personnage préparé.',
+        'Arme de référence du Paladin ; la jungle se fait en solitaire.',
+        { roles: [PALADIN], objet: 'nyrulna', lieu: 'cirque-derniers-jours',
+          alternative: 'Unseen Menace ou Halberd of Vigilance jusqu’à son acquisition.' }),
+      e('v2-a3-mystic-scoundrel', 'optionnel',
+        'Prendre le sac à dos de Band of the Mystic Scoundrel dans la jungle, distinct du coffre de Nyrulna.',
+        'Deux contenants différents : prendre l’un n’ouvre pas l’autre.',
+        { roles: [PALADIN], objet: 'band-mystic-scoundrel', lieu: 'cirque-derniers-jours' }),
+      e('v2-a3-ramazith', 'obligatoire',
+        'Tour de Ramazith : Markoheshkir et Robe of the Weave.',
+        'Pièces finales du Sorcier ; globe à désactiver.',
+        { roles: [SORCIER, SIDEKICK], objet: 'markoheshkir', lieu: 'tour-ramazith',
+          alternative: 'Staff of Spellpower, Melf’s First Staff ou Phalar Aluve.' }),
+      e('v2-a3-reviving-hands', 'obligatoire',
+        'Acheter The Reviving Hands au Tabernacle de la Côte des Tempêtes.',
+        'Blade Ward sur soin et Death Ward sur résurrection pour le Sidekick.',
+        { roles: [SIDEKICK], objet: 'reviving-hands', lieu: 'tabernacle-stormshore',
+          alternative: 'Garder Hellrider’s Pride.' }),
+      e('v2-a3-dammon', 'rattrapable',
+        'Acheter les pièces de Dammon à la Forge des Neuf (Armour et Boots of Persistence, Legacy of the Masters).',
+        'Sa survie conditionne ces achats ; sinon garder les pièces d’acte 2.',
+        { roles: [PALADIN, MOINE, SIDEKICK], objet: 'armour-of-persistence', lieu: 'forge-des-neuf',
+          alternative: 'Adamantine Splint Armour et les gants d’acte 2.' }),
+      e('v2-a3-helsik', 'optionnel',
+        'Débloquer le stock spécial d’Helsik (Cloak of the Weave) et ouvrir son coffre (Mask of Soul Perception).',
+        'Devil’s Fee : cape de contrôle et casque d’attaques du Paladin et du Moine.',
+        { roles: [SORCIER, SIDEKICK, PALADIN, MOINE], objet: 'cloak-of-the-weave', lieu: 'devils-fee' }),
+      e('v2-a3-hope', 'optionnel',
+        'Hope et Raphael : étape dangereuse et tardive, pas une obligation de précipitation.',
+        'Soul Catching et Greater Health sont des options ; n’y aller qu’avec une équipe préparée.',
+        { roles: [MOINE, SORCIER, SIDEKICK, PALADIN], objet: 'gloves-soul-catching', lieu: 'maison-de-lespoir' }),
+      e('v2-a3-greater-health', 'optionnel',
+        'Greater Health ou Fey Semblance : choisir selon concentration ou contrôle mental.',
+        'Ne baisser la CON naturelle qu’une fois l’amulette obtenue et sa copie validée.',
+        { roles: [SORCIER, PALADIN, MOINE, SIDEKICK], objet: 'amulet-greater-health', lieu: 'maison-de-lespoir',
+          alternative: 'Fey Semblance Amulet (Mayrina) ou Spineshudder / Devout selon le rôle.' }),
+      e('v2-a3-copies', 'obligatoire',
+        'Valider les copies finales sans dupliquer le Cheveu ni supposer qu’un objet convient à tous les rôles.',
+        'Un objet copié reste limité à son slot : une amulette, une cape, deux anneaux par personnage.'),
     ],
   },
 ]
 
 export function checklistDe(acte) {
   return CHECKLISTS.find((entree) => entree.acte === acte) ?? null
+}
+
+/** Entrées qui conditionnent la validation d'un acte (les autres ne bloquent jamais). */
+export function estRequise(entree) {
+  return entree.priorite === undefined || entree.priorite === 'obligatoire'
 }
