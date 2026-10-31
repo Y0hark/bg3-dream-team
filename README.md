@@ -43,7 +43,7 @@ le Paladin : aucun n'est généré pour le Moine ni le Sidekick.
 
 | Route | Contenu |
 | --- | --- |
-| `/` | Dashboard : progression du plan, équipement des loadouts, checklists, risques et urgences |
+| `/` | Dashboard : progression du plan, équipement des loadouts, checklists, risques et urgences — ou, en mode « En partie », l'acte joué, les alertes de départ et l'équipement des quatre rôles |
 | `/builds` | Les 4 cartes de build |
 | `/builds/:id` | Fiche : stats, dons, leveling 1 → 12, variantes, divergences, à confirmer, export, objets du plan |
 | `/equipe` | Vue d’équipe : les 4 rôles côte à côte par acte (plans, originaux, copies, exemplaires équipés) et ce qu’il reste à préparer |
@@ -171,6 +171,33 @@ bloque la copie, sauf si une autre source est documentée. Leurs passifs et leur
 persistance sont à **valider en jeu** (case « copie validée »), jamais garantis par
 l'application. Sans copies, le loadout affiche les arbitrages naturels.
 
+### Modes Préparer / En partie
+
+Deux préréglages de lecture des **mêmes routes** (pas de seconde application, pas de
+copie des données). La barre sous la navigation bascule entre :
+
+- **Préparer** (défaut à la première visite) : le dashboard complet, la fiche de build
+  avec « L'essentiel » en tête, alternatives, variantes, sources et dépliants ;
+- **En partie** : l'acte et la zone que vous déclarez d'abord, le récapitulatif « Avant de
+  quitter cette zone » (ticket 3, composant réutilisé), les prochaines actions
+  d'équipement, un résumé *prévu / équipé* par rôle avec accès direct à l'inventaire, et
+  sur la fiche de build l'inventaire avant le résumé. Pas d'export Base64 ni de
+  justification longue en tête.
+
+Comportement à connaître :
+
+- le mode, l'acte et la zone sont mémorisés **sur cet appareil** (clé locale
+  `bg3-affichage`), séparément de la progression : basculer ne modifie ni la possession,
+  ni les plans, ni les affectations, ni les décisions de quête, et n'est pas synchronisé ;
+  le réglage de spoilers reste dans la progression (`acquisition.spoilers`) ;
+- la zone fixe l'acte ; un acte seul est valable. **En partie sans zone** : le site propose
+  de la choisir, donne les plans d'acte (`/equipe?acte=N`) et n'invente aucune action ;
+- les prochaines actions viennent des statuts renseignés (originaux, copies, exemplaires
+  libres). Le site **ne lit pas la sauvegarde du jeu** ; une liste vide veut dire « rien
+  de connu », pas « zone terminée » : aucun score de complétion n'est affiché ;
+- une préférence illisible retombe sur Préparer, sans toucher à la progression ; les
+  routes directes (`/builds/:id?acte=2`) gardent la priorité sur l'acte déclaré.
+
 ### Progression
 
 Statuts possibles d'un objet : **À récupérer**, **Obtenu**, **Raté**, **Remplacé**.
@@ -267,3 +294,24 @@ l'onglet passe en arrière-plan. Quatre thèmes (Grimoire, Flagelleur, Avernus,
 Parchemin) définis par variables CSS dans `src/index.css` et mémorisés localement.
 
 Les animations respectent `prefers-reduced-motion`.
+
+## Livraison, catalogue et tests
+
+**Ordre de livraison** : UX 1/5 (catalogue FR/EN, caractéristiques) → UX 2/5 (inventaire
+par acte) et 3/5 (prérequis et alertes) → UX 4/5 (vue d'équipe) → UX 5/5 (modes). Chaque
+branche part d'une base qui contient ses prérequis.
+
+**Éditer le catalogue** : les objets sont dans `src/data/objets.js` et `objets-meta.js`
+(noms FR/EN, icônes de repli, alternatives) ; les conditions d'acquisition et les
+événements déclaratifs dans `src/data/acquisition.js`. Une condition doit citer sa source
+et rester « à vérifier » tant qu'elle n'est pas confirmée : un effet conditionnel ne
+devient jamais un bonus garanti.
+
+**Limites de suivi** : tout est déclaratif (aucune lecture de la sauvegarde du jeu, aucun
+test en jeu) ; les copies et leurs passifs restent à valider en jeu.
+
+**Tests** : `npm test` (calcul, rendu serveur des deux modes, stockage) et `npm run build`.
+Il n'y a pas de test navigateur automatisé dans le dépôt : les parcours à la souris et au
+clavier (Échap, retour du focus) et le débordement horizontal à 360 px ont été vérifiés à
+la main sur `vite dev` ; le tactile réel, le contraste mesuré et un lecteur d'écran n'ont
+pas été vérifiés.

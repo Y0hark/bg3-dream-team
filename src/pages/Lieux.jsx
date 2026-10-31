@@ -9,10 +9,12 @@ import { ACTES } from '../data/actes.js'
 import { ITEMS } from '../data/items.js'
 import { LIEUX } from '../data/lieux.js'
 import { compter, estResolu, statutDe } from '../lib/progression.js'
+import useAffichage from '../hooks/useAffichage.jsx'
 import useProgression from '../hooks/useProgression.jsx'
 
 export default function Lieux() {
   const { etat } = useProgression()
+  const { zone } = useAffichage()
 
   // Items rattachés à chaque lieu, avec ce qu'il y reste à récupérer.
   const parLieu = useMemo(() => {
@@ -33,7 +35,7 @@ export default function Lieux() {
         chapeau="Les zones qui portent le loadout de la run. Aucune carte du jeu n’est copiée ici : chaque zone renvoie vers le wiki communautaire et vers une carte interactive externe."
       />
 
-      <RecapZone />
+      <RecapZone zoneInitiale={zone} />
 
       {ACTES.map((acte) => {
         const lieux = LIEUX.filter((lieu) => lieu.acte === acte.numero)

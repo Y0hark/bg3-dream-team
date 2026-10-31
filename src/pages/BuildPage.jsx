@@ -15,6 +15,7 @@ import { ITEMS } from '../data/items.js'
 import { ITEMS_ANCIENS } from '../data/items-anciens.js'
 import { accentDe, variableAccent } from '../lib/accents.js'
 import { compter, concerneRole, infosStatut, itemsDuPlan, statutDe, trierItems } from '../lib/progression.js'
+import useAffichage from '../hooks/useAffichage.jsx'
 import useProgression from '../hooks/useProgression.jsx'
 
 function Liste({ titre, entrees, accent }) {
@@ -72,13 +73,16 @@ export default function BuildPage() {
   const { id } = useParams()
   const build = buildDe(id)
   const { etat } = useProgression()
+  const { mode, acte: acteDeclare } = useAffichage()
   const [params, setParams] = useSearchParams()
   const acteBrut = Number(params.get('acte'))
-  const acte = ACTES.some((entree) => entree.numero === acteBrut) ? acteBrut : 1
+  // L'URL prime ; sans paramètre, En partie reprend l'acte déclaré, Préparer l'acte I.
+  const acteParDefaut = mode === 'en-partie' && acteDeclare ? acteDeclare : 1
+  const acte = ACTES.some((entree) => entree.numero === acteBrut) ? acteBrut : acteParDefaut
 
   function choisirActe(numero) {
     const suivant = new URLSearchParams(params)
-    if (numero === 1) suivant.delete('acte')
+    if (numero === acteParDefaut) suivant.delete('acte')
     else suivant.set('acte', String(numero))
     setParams(suivant, { replace: true })
   }
@@ -139,6 +143,54 @@ export default function BuildPage() {
         </p>
       )}
 
+      {/* En partie : l'inventaire d'abord ; Préparer : l'essentiel d'abord. Mêmes blocs, autre ordre. */}
+      {mode === 'en-partie' ? (
+        <>
+      {/* --- Inventaire par acte ----------------------------------------- */}
+      {!build.ancienne && (
+        <Revelation className="plaque mt-4 p-5 sm:p-6">
+          <InventaireRole role={build.id} acte={acte} onActe={choisirActe} accent={accent} />
+          <p className="mt-4 text-xs text-gray-400">
+            Suivi d’obtention, copies et équipement de tous les rôles :{' '}
+            <Link to={`/loadout?role=${build.id}&acte=${acte}`} className="underline underline-offset-4 hover:text-or-100">
+              loadouts de ce rôle
+            </Link>
+            .
+          </p>
+        </Revelation>
+      )}
+
+      {/* --- Lecture immédiate : trois points et les avertissements critiques --- */}
+      <Revelation className="plaque p-5 sm:p-6" data-resume>
+        <h2 className="grave text-base tracking-[0.1em]">L’essentiel</h2>
+        <ul className="mt-4 space-y-2 text-sm leading-relaxed text-gray-300">
+          <li>
+            <span className="glyphe">Rôle · </span>
+            {build.role}
+          </li>
+          <li>
+            <span className="glyphe">Répartition finale · </span>
+            {build.split}
+          </li>
+          {vigilance && (
+            <li className="text-amber-100">
+              <span className="font-rune text-[0.65rem] uppercase tracking-[0.14em] text-amber-200">Vigilance · </span>
+              {vigilance}
+            </li>
+          )}
+        </ul>
+        {aConfirmer.length > 0 && (
+          <p role="note" className="mt-4 text-xs leading-relaxed text-amber-200">
+            ⚠ {aConfirmer.length} point{aConfirmer.length > 1 ? 's' : ''} à confirmer, dont : {aConfirmer[0].texte.split('.')[0]}.{' '}
+            <a href="#depliant-a-confirmer" className="underline underline-offset-4">
+              Tout lire
+            </a>
+          </p>
+        )}
+      </Revelation>
+        </>
+      ) : (
+        <>
       {/* --- Lecture immédiate : trois points et les avertissements critiques --- */}
       <Revelation className="plaque p-5 sm:p-6" data-resume>
         <h2 className="grave text-base tracking-[0.1em]">L’essentiel</h2>
@@ -180,6 +232,8 @@ export default function BuildPage() {
             .
           </p>
         </Revelation>
+      )}
+        </>
       )}
 
       {/* --- Caractéristiques, en vues nommées --------------------------- */}
