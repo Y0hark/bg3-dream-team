@@ -71,11 +71,14 @@ function Declarations({ zoneId }) {
  * « Avant de quitter cette zone » — composant réutilisé tel quel par le
  * ticket 5 (aucun second moteur d'alertes : tout vient de lib/acquisition.js).
  */
-export default function RecapZone({ zoneInitiale = null }) {
+export default function RecapZone({ zoneInitiale = null, zone, onZone }) {
   const { etat, definirSpoilers } = useProgression()
   const [roles, setRoles] = useState(BUILDS.map((build) => build.id))
   const [alternatives, setAlternatives] = useState(false)
-  const [zoneId, setZoneId] = useState(zoneInitiale)
+  const [zoneLocale, setZoneLocale] = useState(zoneInitiale)
+  // Contrôlé quand la zone vient de l'affichage déclaré (mode En partie), local sinon.
+  const zoneId = zone !== undefined ? zone : zoneLocale
+  const setZoneId = (valeur) => (onZone ? onZone(valeur) : setZoneLocale(valeur))
   const options = useMemo(() => ({ roles, alternatives }), [roles, alternatives])
 
   const zones = useMemo(() => zonesAvecAlertes(etat, options), [etat, options])

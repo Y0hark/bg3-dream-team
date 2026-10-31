@@ -14,6 +14,12 @@ export const CLE_CODE_RUN = 'bg3-code-run'
 /** Dernier horodatage serveur connu — sert à détecter l'écriture d'un autre appareil. */
 export const CLE_MAJ_DISTANTE = 'bg3-maj-distante'
 
+/**
+ * Préférences d'AFFICHAGE (mode, acte, zone déclarés) : locales à l'appareil,
+ * jamais synchronisées, jamais mélangées à la progression (`CLE_PROGRESSION`).
+ */
+export const CLE_AFFICHAGE = 'bg3-affichage'
+
 /** Test d'écriture réel : `localStorage` peut exister et lever à l'usage. */
 export function stockageDisponible() {
   try {

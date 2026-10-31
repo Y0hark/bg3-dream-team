@@ -1,15 +1,18 @@
 import { useEffect } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import BanniereMigration from './components/BanniereMigration.jsx'
+import BarreMode from './components/BarreMode.jsx'
 import BanniereStockage from './components/BanniereStockage.jsx'
 import FondAnime from './components/FondAnime.jsx'
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
 import RetourEnHaut from './components/RetourEnHaut.jsx'
+import { FournisseurAffichage } from './hooks/useAffichage.jsx'
 import { FournisseurProgression } from './hooks/useProgression.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import Builds from './pages/Builds.jsx'
 import BuildPage from './pages/BuildPage.jsx'
+import Equipe from './pages/Equipe.jsx'
 import Loadout from './pages/Loadout.jsx'
 import Items from './pages/Items.jsx'
 import Lieux from './pages/Lieux.jsx'
@@ -41,17 +44,20 @@ export default function App() {
 
   return (
     <FournisseurProgression>
+      <FournisseurAffichage>
       <FondAnime />
       <div className="couche-contenu flex min-h-screen flex-col">
         <RestaurerLeScroll />
         <BanniereStockage />
         <BanniereMigration />
         <Navbar />
+        <BarreMode />
         <main key={pathname} className="entree-page flex-1">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/builds" element={<Builds />} />
             <Route path="/builds/:id" element={<BuildPage />} />
+            <Route path="/equipe" element={<Equipe />} />
             <Route path="/loadout" element={<Loadout />} />
             <Route path="/items" element={<Items />} />
             <Route path="/lieux" element={<Lieux />} />
@@ -63,6 +69,7 @@ export default function App() {
         <Footer />
         <RetourEnHaut />
       </div>
+      </FournisseurAffichage>
     </FournisseurProgression>
   )
 }

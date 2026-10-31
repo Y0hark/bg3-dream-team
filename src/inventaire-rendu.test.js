@@ -68,3 +68,35 @@ describe('inventaire visuel — rendu', () => {
     expect(html).toContain('data-inventaire="moine-main-ouverte"')
   })
 })
+
+describe('vue d’équipe — rendu', () => {
+  it.each([1, 2, 3])('acte %i : les quatre rôles, bascule mobile et besoins', (acte) => {
+    const html = rendre(`/equipe?acte=${acte}`)
+    for (const build of BUILDS) expect(html).toContain(`data-role="${build.id}"`)
+    expect(html).toContain('data-besoins')
+    expect(html).toContain('Ce qu’il reste à préparer')
+    expect(html).toContain('PLANS')
+    expect(html).toContain('role="group" aria-label="Rôle affiché"')
+    expect(html).toContain('aria-live="polite"')
+  })
+
+  it('un seul rôle est visible sur mobile, les autres ne le sont que sur bureau', () => {
+    const html = rendre('/equipe?role=moine-main-ouverte')
+    expect(html).toMatch(/data-role="moine-main-ouverte"[^>]*class="plaque min-w-0 p-4 "/)
+    expect(html).toMatch(/data-role="sorcier-feu"[^>]*class="plaque min-w-0 p-4 hidden lg:block"/)
+  })
+
+  it('chaque emplacement renvoie vers l’inventaire du rôle à l’acte', () => {
+    expect(rendre('/equipe?acte=2')).toContain('href="/builds/sorcier-feu?acte=2#inventaire-sorcier-feu"')
+  })
+
+  it('sans original, propose de le récupérer et n’affiche aucun équipé', () => {
+    const html = rendre('/equipe?acte=2')
+    expect(html).toContain('Originaux à récupérer')
+    expect(html).not.toContain('Libérer l’exemplaire')
+  })
+
+  it('la barre de navigation expose l’Équipe', () => {
+    expect(rendre('/')).toContain('href="/equipe"')
+  })
+})
