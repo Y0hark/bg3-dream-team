@@ -91,8 +91,8 @@ export const BUILDS = [
         },
       ],
       fixees: [
-        { id: 'gants-dexterite', source: 'Gloves of Dexterity', type: 'equipement', stat: 'DEX', valeur: 18, condition: 'Rétablir une DEX naturelle correcte avant de les remplacer par Spellmight.' },
-        { id: 'greater-health', source: 'Amulet of Greater Health', type: 'equipement', stat: 'CON', valeur: 23, condition: 'Ne baisser la CON par respécialisation qu’une fois l’amulette (ou sa copie) obtenue et validée.' },
+        { id: 'gants-dexterite', source: 'Gloves of Dexterity', type: 'equipement', stat: 'DEX', valeur: 18, condition: 'Rétablir une DEX naturelle correcte avant de les remplacer par Spellmight.', verification: 'fiche', reference: 'https://bg3.wiki/wiki/Gloves_of_Dexterity' },
+        { id: 'greater-health', source: 'Amulet of Greater Health', type: 'equipement', stat: 'CON', valeur: 23, condition: 'Ne baisser la CON par respécialisation qu’une fois l’amulette (ou sa copie) obtenue et validée.', verification: 'a-confirmer', reference: 'https://bg3.wiki/wiki/Amulet_of_Greater_Health' },
       ],
       variantes: [
         {
@@ -257,7 +257,7 @@ export const BUILDS = [
       bonusDons: [{ niveau: 8, stat: 'CHA', valeur: 2, source: 'Don Occultiste 4 (niveau 8)' }],
       bonusPermanents: [],
       fixees: [
-        { id: 'greater-health', source: 'Amulet of Greater Health', type: 'equipement', stat: 'CON', valeur: 23, condition: 'Retirer l’amulette après avoir baissé la CON par respécialisation est dangereux.' },
+        { id: 'greater-health', source: 'Amulet of Greater Health', type: 'equipement', stat: 'CON', valeur: 23, condition: 'Retirer l’amulette après avoir baissé la CON par respécialisation est dangereux.', verification: 'a-confirmer', reference: 'https://bg3.wiki/wiki/Amulet_of_Greater_Health' },
       ],
       variantes: [
         {
@@ -443,10 +443,10 @@ export const BUILDS = [
         { id: 'graceful-cloth', source: 'The Graceful Cloth', stat: 'DEX', valeur: 2, plafond: 20 },
       ],
       fixees: [
-        { id: 'elixir-geant-collines', source: 'Elixir of Hill Giant Strength', type: 'elixir', stat: 'FOR', valeur: 21, condition: 'Un seul élixir actif : incompatible avec Soif de sang et Vigilance simultanés.' },
-        { id: 'elixir-geant-nuages', source: 'Elixir of Cloud Giant Strength', type: 'elixir', stat: 'FOR', valeur: 27, condition: 'Peut apparaître dans les stocks à partir du niveau 9, sans disponibilité garantie.' },
-        { id: 'gantelets-geant-collines', source: 'Gauntlets of Hill Giant Strength', type: 'equipement', stat: 'FOR', valeur: 23, condition: 'Acte 3, Maison de l’Espoir. Occupe les mains à la place de Soul Catching.' },
-        { id: 'greater-health', source: 'Amulet of Greater Health', type: 'equipement', stat: 'CON', valeur: 23, condition: 'Respécialisation tardive possible seulement une fois l’objet acquis et sa copie validée.' },
+        { id: 'elixir-geant-collines', source: 'Elixir of Hill Giant Strength', type: 'elixir', stat: 'FOR', valeur: 21, condition: 'Un seul élixir actif : incompatible avec Soif de sang et Vigilance simultanés.', verification: 'fiche', reference: 'https://bg3.wiki/wiki/Elixir_of_Hill_Giant_Strength' },
+        { id: 'elixir-geant-nuages', source: 'Elixir of Cloud Giant Strength', type: 'elixir', stat: 'FOR', valeur: 27, condition: 'Peut apparaître dans les stocks à partir du niveau 9, sans disponibilité garantie.', verification: 'a-confirmer', reference: 'https://bg3.wiki/wiki/Elixir_of_Cloud_Giant_Strength' },
+        { id: 'gantelets-geant-collines', source: 'Gauntlets of Hill Giant Strength', type: 'equipement', stat: 'FOR', valeur: 23, condition: 'Acte 3, Maison de l’Espoir. Occupe les mains à la place de Soul Catching.', verification: 'fiche', reference: 'https://bg3.wiki/wiki/Gauntlets_of_Hill_Giant_Strength' },
+        { id: 'greater-health', source: 'Amulet of Greater Health', type: 'equipement', stat: 'CON', valeur: 23, condition: 'Respécialisation tardive possible seulement une fois l’objet acquis et sa copie validée.', verification: 'a-confirmer', reference: 'https://bg3.wiki/wiki/Amulet_of_Greater_Health' },
       ],
       variantes: [],
     },
@@ -575,7 +575,7 @@ export const BUILDS = [
       bonusDons: [{ niveau: 5, stat: 'CHA', valeur: 2, source: 'Don Barde 4' }],
       bonusPermanents: [],
       fixees: [
-        { id: 'greater-health', source: 'Amulet of Greater Health', type: 'equipement', stat: 'CON', valeur: 23, condition: 'Si elle fournit l’avantage de CON, War Caster devient en partie redondant ; ne pas baisser la CON naturelle avant de dépendre de l’objet.' },
+        { id: 'greater-health', source: 'Amulet of Greater Health', type: 'equipement', stat: 'CON', valeur: 23, condition: 'Si elle fournit l’avantage de CON, War Caster devient en partie redondant ; ne pas baisser la CON naturelle avant de dépendre de l’objet.', verification: 'a-confirmer', reference: 'https://bg3.wiki/wiki/Amulet_of_Greater_Health' },
       ],
       variantes: [],
     },

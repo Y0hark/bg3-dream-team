@@ -10,6 +10,8 @@ import { estRequise } from '../data/checklists.js'
 import { PRIORITES } from '../data/items.js'
 import { LOADOUTS, loadoutsDe } from '../data/loadouts.js'
 import { objetDe } from '../data/objets.js'
+import { normaliserTexte } from './localisation.js'
+import { normaliserChoix } from './alternatives.js'
 import { etatCopies, normaliserCopies, REGLAGES_COPIES } from './copies.js'
 import { ID_COMPOSITION, VERSION_SCHEMA } from './schema.js'
 
@@ -72,6 +74,7 @@ export function estResolu(statut) {
  *
  * - `items` / `checklist` : la progression du catalogue ACTIF ;
  * - `copies` : original ≠ exemplaires ≠ équipement (cf. copies.js) ;
+ * - `choixAlternatives` : préférences de plan par rôle/acte/slot (alternatives.js) ;
  * - `archive` : ce que le catalogue actif ne connaît plus (ancienne
  *   composition) — jamais supprimé, récupérable et exportable.
  */
@@ -82,6 +85,8 @@ export function etatInitial() {
     items: {},
     checklist: {},
     copies: {},
+    // Préférences de plan par rôle/acte/slot (cf. alternatives.js) — ni possession ni équipement.
+    choixAlternatives: {},
     archive: { items: {}, checklist: {} },
   }
 }
@@ -127,6 +132,7 @@ export function normaliserEtat(brut) {
   etat.items = statutsValides(brut.items)
   etat.checklist = coches(brut.checklist)
   etat.copies = normaliserCopies(brut.copies)
+  etat.choixAlternatives = normaliserChoix(brut.choixAlternatives)
   etat.archive = {
     items: statutsValides(brut.archive?.items),
     checklist: coches(brut.archive?.checklist),
@@ -270,8 +276,8 @@ export function filtrerItems(items, filtres, etat) {
     if (filtres.priorite !== 'tous' && item.priorite !== filtres.priorite) return false
     if (filtres.statut !== 'tous' && statutDe(etat, item.id) !== filtres.statut) return false
     if (recherche) {
-      const foin = `${item.nom} ${item.slot} ${item.source ?? ''} ${item.note ?? ''}`.toLowerCase()
-      if (!foin.includes(recherche)) return false
+      const foin = normaliserTexte(`${item.nomFr ?? ''} ${item.nom} ${item.slot} ${item.source ?? ''} ${item.note ?? ''}`)
+      if (!foin.includes(normaliserTexte(recherche))) return false
     }
     return true
   })

@@ -1,9 +1,11 @@
 import { BadgeActe, BadgePriorite } from './Badges.jsx'
+import IconeObjet from './IconeObjet.jsx'
 import LienExterne from './LienExterne.jsx'
 import Revelation from './Revelation.jsx'
 import { buildDe } from '../data/builds.js'
 import { lieuDe } from '../data/lieux.js'
 import { accentDe, variableAccent } from '../lib/accents.js'
+import { nomsObjet } from '../lib/localisation.js'
 import { STATUTS, estResolu } from '../lib/progression.js'
 import useProgression from '../hooks/useProgression.jsx'
 
@@ -65,14 +67,18 @@ export default function ItemCard({ item, statut, index = 0, montrerPersonnage = 
         />
 
         <header className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
+          <IconeObjet objet={item} />
+          <div className="min-w-0 flex-1">
             <h3
               className={`font-display text-sm uppercase tracking-[0.08em] ${
                 statut === 'rate' ? 'text-red-300 line-through' : 'text-or-100'
               }`}
             >
-              {item.nom}
+              {nomsObjet(item).principal}
             </h3>
+            {nomsObjet(item).secondaire && (
+              <p className="text-xs text-gray-500">{nomsObjet(item).secondaire}</p>
+            )}
             <p className="mt-1 font-rune text-[0.65rem] uppercase tracking-[0.14em] text-gray-500">
               {item.slot}
               {montrerPersonnage && build
