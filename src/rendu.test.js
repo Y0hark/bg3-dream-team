@@ -14,7 +14,7 @@ globalThis.localStorage = {
   removeItem: () => {},
 }
 
-const ROUTES = ['/', '/builds', '/builds/sam-freeze-thunder', '/loadout', '/items', '/items?acte=2&statut=rate', '/lieux', '/checklist', '/inconnue']
+const ROUTES = ['/', '/builds', '/builds/sorcier-feu', '/builds/paladin-hexblade', '/builds/moine-main-ouverte', '/builds/sidekick-savoir-vie', '/builds/sam-freeze-thunder', '/loadout', '/items', '/items?acte=2&statut=rate', '/lieux', '/checklist', '/inconnue']
 
 describe('rendu des routes', () => {
   it.each(ROUTES)('rend %s sans erreur', (route) => {

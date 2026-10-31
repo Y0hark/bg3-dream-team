@@ -5,7 +5,7 @@
 // se contente de le persister. C'est ce fichier que couvrent les tests.
 // ------------------------------------------------------------------
 import { ACTES } from '../data/actes.js'
-import { BUILDS } from '../data/builds.js'
+import { buildDe } from '../data/builds.js'
 import { PRIORITES } from '../data/items.js'
 
 export const STATUTS = [
@@ -273,7 +273,8 @@ export function filtresDepuisParams(params) {
   if (acte && ACTES.some((entree) => String(entree.numero) === acte)) filtres.acte = acte
 
   const personnage = lire('personnage')
-  if (personnage && BUILDS.some((build) => build.id === personnage)) {
+  // Un lien diffusé avant la V2 peut viser un rôle de l'ancienne composition.
+  if (personnage && buildDe(personnage)) {
     filtres.personnage = personnage
   }
 
