@@ -1,4 +1,5 @@
 import { BadgeActe, BadgePriorite } from './Badges.jsx'
+import { BadgesAcquisition } from './AlertesAcquisition.jsx'
 import IconeObjet from './IconeObjet.jsx'
 import LienExterne from './LienExterne.jsx'
 import Revelation from './Revelation.jsx'
@@ -97,6 +98,8 @@ export default function ItemCard({ item, statut, index = 0, montrerPersonnage = 
             </span>
           )}
         </div>
+
+        <BadgesAcquisition objetId={item.id} className="mt-2" />
 
         {item.note && <p className="mt-3 text-sm leading-relaxed text-gray-300">{item.note}</p>}
 

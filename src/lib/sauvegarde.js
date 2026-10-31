@@ -22,6 +22,7 @@
 import { CHECKLISTS } from '../data/checklists.js'
 import { itemDe } from '../data/items.js'
 import { etatInitial, normaliserEtat, STATUT_DEFAUT, statutValide } from './progression.js'
+import { acquisitionRenseignee } from './acquisition-etat.js'
 import { CLE_AVANT_MIGRATION, ID_COMPOSITION, VERSION_SCHEMA } from './schema.js'
 
 export { CLE_AVANT_MIGRATION, ID_COMPOSITION, VERSION_SCHEMA }
@@ -55,7 +56,8 @@ export function aDeLaProgression(etat) {
   return (
     Object.keys(etat?.items ?? {}).length > 0 ||
     Object.keys(etat?.checklist ?? {}).length > 0 ||
-    Object.keys(etat?.copies ?? {}).length > 0
+    Object.keys(etat?.copies ?? {}).length > 0 ||
+    acquisitionRenseignee(etat?.acquisition)
   )
 }
 

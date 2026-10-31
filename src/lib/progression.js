@@ -13,6 +13,7 @@ import { objetDe } from '../data/objets.js'
 import { normaliserTexte } from './localisation.js'
 import { normaliserChoix } from './alternatives.js'
 import { etatCopies, normaliserCopies, REGLAGES_COPIES } from './copies.js'
+import { acquisitionInitiale, normaliserAcquisition } from './acquisition-etat.js'
 import { ID_COMPOSITION, VERSION_SCHEMA } from './schema.js'
 
 export const STATUTS = [
@@ -75,6 +76,8 @@ export function estResolu(statut) {
  * - `items` / `checklist` : la progression du catalogue ACTIF ;
  * - `copies` : original ≠ exemplaires ≠ équipement (cf. copies.js) ;
  * - `choixAlternatives` : préférences de plan par rôle/acte/slot (alternatives.js) ;
+ * - `acquisition` : faits et décisions déclarés pour les alertes d'acquisition
+ *   (acquisition-etat.js) — additif, jamais une possession ;
  * - `archive` : ce que le catalogue actif ne connaît plus (ancienne
  *   composition) — jamais supprimé, récupérable et exportable.
  */
@@ -87,6 +90,7 @@ export function etatInitial() {
     copies: {},
     // Préférences de plan par rôle/acte/slot (cf. alternatives.js) — ni possession ni équipement.
     choixAlternatives: {},
+    acquisition: acquisitionInitiale(),
     archive: { items: {}, checklist: {} },
   }
 }
@@ -133,6 +137,7 @@ export function normaliserEtat(brut) {
   etat.checklist = coches(brut.checklist)
   etat.copies = normaliserCopies(brut.copies)
   etat.choixAlternatives = normaliserChoix(brut.choixAlternatives)
+  etat.acquisition = normaliserAcquisition(brut.acquisition)
   etat.archive = {
     items: statutsValides(brut.archive?.items),
     checklist: coches(brut.archive?.checklist),

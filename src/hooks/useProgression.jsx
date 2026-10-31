@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { objetDe } from '../data/objets.js'
 import { avecChoix } from '../lib/alternatives.js'
+import { avecEvenement, avecStatutAlerte, MODES_SPOILERS } from '../lib/acquisition-etat.js'
 import { affecter, ajouterCopie, normaliserSuivi } from '../lib/copies.js'
 import {
   etatInitial,
@@ -171,6 +172,24 @@ export function FournisseurProgression({ children }) {
       ...precedent,
       choixAlternatives: avecChoix(precedent.choixAlternatives, role, acte, slot, indice, objetId, referenceId),
     }))
+  }, [])
+
+  // --- Alertes d'acquisition : déclaratif et réversible, jamais une possession ---
+  const declarerEvenement = useCallback((id, declare = true) => {
+    setEtat((precedent) => ({ ...precedent, acquisition: avecEvenement(precedent.acquisition, id, declare) }))
+  }, [])
+
+  // `statut` null remet l'alerte « à vérifier » ; 'fait' et 'ignore' restent annulables.
+  const definirStatutAlerte = useCallback((conditionId, statut) => {
+    setEtat((precedent) => ({
+      ...precedent,
+      acquisition: avecStatutAlerte(precedent.acquisition, conditionId, statut),
+    }))
+  }, [])
+
+  const definirSpoilers = useCallback((mode) => {
+    if (!MODES_SPOILERS.includes(mode)) return
+    setEtat((precedent) => ({ ...precedent, acquisition: { ...precedent.acquisition, spoilers: mode } }))
   }, [])
 
   const definirStatut = useCallback((itemId, statut) => {
@@ -390,6 +409,9 @@ export function FournisseurProgression({ children }) {
       liberer,
       validerCopie,
       choisirAlternative,
+      declarerEvenement,
+      definirStatutAlerte,
+      definirSpoilers,
     }),
     [
       etat,
@@ -413,6 +435,9 @@ export function FournisseurProgression({ children }) {
       liberer,
       validerCopie,
       choisirAlternative,
+      declarerEvenement,
+      definirStatutAlerte,
+      definirSpoilers,
     ],
   )
 

@@ -1,3 +1,4 @@
+import { FicheAcquisition } from './AlertesAcquisition.jsx'
 import { BadgeActe } from './Badges.jsx'
 import LienExterne from './LienExterne.jsx'
 import SuiviCopies from './SuiviCopies.jsx'
@@ -133,6 +134,8 @@ export default function FicheObjet({ emplacement, option, role, acte, onChanger 
           ))}
         </ul>
       </section>
+
+      <FicheAcquisition objetId={objet.id} />
 
       <section aria-labelledby={`suivi-${fiche.id}`} className="space-y-2">
         <h3 id={`suivi-${fiche.id}`} className="glyphe">

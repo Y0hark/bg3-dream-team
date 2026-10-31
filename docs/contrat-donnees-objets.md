@@ -76,7 +76,7 @@ Pour remplir : ajouter une entrée dans `NOMS_FR` / `ICONES` ; aucun autre chang
 Réutiliser : catalogue `objets.js`, loadouts, `copies.js`, `caracteristiquesEffectives`, migration `sauvegarde.js`.
 Adapter : `items.js` (champs FR/icône/usages), `filtrerItems` (recherche bilingue), `ItemCard` (icône + nom FR/EN).
 Livré au ticket 2 : inventaire visuel par acte (`lib/inventaire.js`, `components/InventaireRole.jsx`), choix d'alternatives (`choisirAlternative`), vues de caractéristiques (`PanneauCaracteristiques`).
-Manque (tickets suivants) : alertes d'acquisition (3), affectation d'exemplaires (4), affichage des étapes de caractéristiques dans `BuildPage` (suite), traduction FR officielle et icônes (sources à clarifier).
+Livré au ticket 3 : conditions d'acquisition et alertes (section 11). Manque (tickets suivants) : affectation d'exemplaires (4), affichage des étapes de caractéristiques dans `BuildPage` (suite), traduction FR officielle et icônes (sources à clarifier).
 
 ## 9. Surfaces à texte utilisateur (à traduire / auditer)
 
@@ -91,3 +91,39 @@ Navigation (`Navbar`), `Dashboard`, `BuildPage`, `Builds`, `Loadout`, `Items` (+
 - **Compatibilité** : les données n'encodent ni prise en main ni maîtrises ; l'interface signale « à vérifier » (arme + bouclier, Moine Main ouverte) et n'affirme jamais une compatibilité.
 - **Alertes d'acquisition** : lues dans `objet.sources` (verrou, `aConfirmer`, lieu absent). Une condition non renseignée reste inconnue ; la logique du ticket 3 n'est pas réimplémentée.
 - **Caractéristiques** : vues Création / Progression / Respécialisation / Équipement / Export utilisateur, uniquement quand les données existent ; l'ordre de progression Paladin non confirmé reste signalé.
+
+## 11. Conditions d'acquisition et alertes avant départ (ticket UX 3/5)
+
+- **Propriété** : `data/acquisition.js` possède les conditions sourcées (catégorie, objets, zone, événement, sévérité, portée, confiance, texte discret / détail, sources, voies). `lib/acquisition.js` possède l'évaluation et le récapitulatif ; `components/RecapZone.jsx` est le composant réutilisé par le ticket 5 (pas de second moteur). Les sources de base (acte, lieu, verrou) restent dans `objets.js`.
+- **Persistance** : `etat.acquisition = { evenements, statuts, spoilers }`, additif, normalisé sans montée de `VERSION_SCHEMA` (comme `choixAlternatives`). Statuts, checklists et copies existants sont inchangés. Limite connue : une ancienne version de l'application qui réécrirait l'état perdrait ce champ.
+- **Trois résultats** : `satisfait` (original obtenu, voie alternative déclarée, ou « fait » confirmé), `non-satisfait` (événement irréversible déclaré, rien ne satisfait), `inconnu` (tout le reste). « Ignorer » masque sans résoudre et se restaure. Aucun feu vert par défaut.
+- **Événements** : déclaratifs, nommés, sourcés (`EVENEMENTS`). Un événement ne rend une condition impossible que si la source établit l'irréversibilité (`irreversible: true`, jamais avec une confiance `a-verifier`). Pas de déduction depuis l'acte ou une visite de zone.
+- **Original ≠ copies** : seul `etat.items` lève l'alerte ; `etat.copies` n'est jamais lu par le moteur d'alertes, aucune alerte par copie.
+- **Spoilers** : `discret` par défaut (catégorie, sévérité, zone, titre neutre visibles ; détail et, pour `masquerObjets`, noms d'objets sur demande), `detail` pour tout afficher. Le mode discret ne masque jamais l'existence d'une urgence.
+- **Récapitulatif** : filtré par équipe, alternatives sur option, alerte commune dédoublonnée avec ses objets et rôles. Message « Rien de bloquant identifié dans les données vérifiées » uniquement sans alerte ouverte ni objet prévu manquant ; les objets non audités sont listés à part.
+
+### Conditions (état au 2026-10-31)
+
+| Mesure | Résultat |
+| --- | --- |
+| Conditions | 12 : 5 recoupées sur BG3 Wiki, 2 de fiche d'équipe, 5 « à vérifier sur votre version » |
+| Conditions irréversibles (source établie) | 3 : Kushigo (fiche + wiki partiel), boutique de Roah Acte II (wiki), boutique d'Ethel + Cheveu (wiki) |
+| Catégorie sans cas sourcé | `compagnon-requis` — non inventée |
+
+### Couverture d'audit (104 objets)
+
+| Niveau | Objets |
+| --- | --- |
+| Audité, contraintes connues | 19 |
+| Aucune contrainte connue **(lecture du catalogue, non recoupée un à un sur le wiki)** | 30 |
+| **Non audité** (verrou PNJ/quête non détaillé, source à confirmer ou lieu non catalogué) | 55 |
+
+`tableauCouverture()` produit ces listes. L'absence de condition n'est jamais la preuve d'une absence de risque.
+
+### Réserves
+
+- Aucun hotfix n'est connu : une condition `verifie` l'est à la date de vérification, pas pour toutes les versions.
+- Hat of Fire Acuity : le wiki et la fiche divergent sur l'effet de la mort du Bœuf étrange au Bosquet ; la condition reste `a-verifier`, sans événement irréversible.
+- Kushigo : le wiki ne cite que Lir'i'c comme source, sans rattrapage ni point de non-retour explicite ; l'irréversibilité vient de la fiche d'équipe.
+- Dammon : le wiki ne dit pas que sa mort ferme son commerce ; aucune interdiction n'est affichée.
+- Non fait : lecture de sauvegarde BG3, guide exhaustif des quêtes, vérification visuelle sur appareil mobile réel.
