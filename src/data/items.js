@@ -60,6 +60,9 @@ function derive(objet) {
     personnage: proprietaire,
     roles,
     priorite: priorite(objet, lignes),
+    // Dans le plan = principal pour au moins un rôle. Les alternatives, objets
+    // situationnels et réserves ne gonflent pas le dénominateur de la progression.
+    dansLePlan: lignes.some((ligne) => ligne.rang === 'principal'),
     lieu: principale.lieu,
     source: objet.sources.map((source) => source.texte).join(' · '),
     wiki: objet.wiki,

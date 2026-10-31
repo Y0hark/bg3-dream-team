@@ -10,8 +10,10 @@ import { CHECKLISTS } from '../data/checklists.js'
 import { ITEMS } from '../data/items.js'
 import { accentDe, variableAccent } from '../lib/accents.js'
 import {
+  completudeLoadout,
   compter,
   itemsCritiques,
+  itemsDuPlan,
   itemsRates,
   progressionChecklists,
   progressionParActe,
@@ -67,8 +69,15 @@ function BoutonReset() {
 export default function Dashboard() {
   const { etat } = useProgression()
 
-  const global = useMemo(() => compter(ITEMS, etat), [etat])
-  const parActe = useMemo(() => progressionParActe(ITEMS, etat), [etat])
+  // Le dénominateur est le PLAN (objets portés en principal), pas le catalogue :
+  // documenter une variante de plus ne doit pas faire baisser la progression.
+  const plan = useMemo(() => itemsDuPlan(ITEMS), [])
+  const global = useMemo(() => compter(plan, etat), [plan, etat])
+  const parActe = useMemo(() => progressionParActe(plan, etat), [plan, etat])
+  const equipement = useMemo(
+    () => BUILDS.map((build) => ({ build, ...completudeLoadout(build.id, etat) })),
+    [etat],
+  )
   const parPersonnage = useMemo(() => progressionParPersonnage(ITEMS, etat, BUILDS), [etat])
   const checklists = useMemo(() => progressionChecklists(CHECKLISTS, etat), [etat])
   const rates = useMemo(() => trierItems(itemsRates(ITEMS, etat)), [etat])
@@ -79,14 +88,14 @@ export default function Dashboard() {
       <EnteteSection
         surtitre="Mode Honneur · une seule sauvegarde"
         titre="BG3 Honor Run Tracker"
-        chapeau="La synthèse de la run : où en est l’équipe, ce qui reste à récupérer acte par acte, et ce qui a été manqué. Tout est stocké dans ce navigateur — rien ne part sur un serveur."
+        chapeau="La synthèse de la run : où en est l’équipe (Sorcier feu, Paladin, Moine, Sidekick), ce qui reste à récupérer acte par acte, ce qui est réellement équipé, et ce qui a été manqué. Tout est stocké dans ce navigateur — rien ne part sur un serveur."
         aside={<BoutonReset />}
       />
 
       {/* --- Chiffres de tête ---------------------------------------- */}
       <Revelation className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <Compteur valeur={`${global.pourcentage} %`} libelle="Loadout résolu" />
-        <Compteur valeur={`${global.resolus}/${global.total}`} libelle="Items sécurisés" />
+        <Compteur valeur={`${global.pourcentage} %`} libelle="Objets du plan sécurisés" />
+        <Compteur valeur={`${global.resolus}/${global.total}`} libelle="Originaux du plan" />
         <Compteur valeur={global.restants} libelle="Encore à récupérer" teinte="text-amber-100" />
         <Compteur
           valeur={global.rates}
@@ -100,6 +109,18 @@ export default function Dashboard() {
           libelle="Progression globale"
           detail={`${global.resolus} résolus · ${global.rates} ratés · ${global.restants} restants`}
           pourcentage={global.pourcentage}
+        />
+        <BarreProgression
+          libelle="Équipement des loadouts"
+          detail={`${equipement.reduce((somme, ligne) => somme + ligne.equipes, 0)}/${equipement.reduce((somme, ligne) => somme + ligne.total, 0)} exemplaires affectés · distinct de l’acquisition`}
+          pourcentage={
+            Math.round(
+              (equipement.reduce((somme, ligne) => somme + ligne.equipes, 0) /
+                Math.max(1, equipement.reduce((somme, ligne) => somme + ligne.total, 0))) *
+                100,
+            )
+          }
+          teinte="bg-sky-400/80"
         />
         <BarreProgression
           libelle="Checklists de fin d’acte"

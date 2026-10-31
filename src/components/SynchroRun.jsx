@@ -13,6 +13,9 @@ const ETATS = {
   chargement: { libelle: 'Connexion…', teinte: 'bg-amber-300/80 animate-pulse' },
   envoi: { libelle: 'Envoi…', teinte: 'bg-amber-300/80 animate-pulse' },
   synchro: { libelle: 'Sauvegardé', teinte: 'bg-emerald-400/90' },
+  connecte: { libelle: 'En ligne — rien encore envoyé', teinte: 'bg-sky-300/80' },
+  bloque: { libelle: 'Synchronisation suspendue', teinte: 'bg-red-400/90' },
+  'attente-migration': { libelle: 'En attente de la migration', teinte: 'bg-amber-300/80' },
   erreur: { libelle: 'Hors ligne', teinte: 'bg-red-400/90' },
 }
 
@@ -124,7 +127,11 @@ export default function SynchroRun() {
                 <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${etat.teinte}`} />
                 {synchro.statut === 'erreur'
                   ? `${synchro.erreur} — la progression reste enregistrée dans ce navigateur.`
-                  : [etat.libelle, depuis(synchro.majLe)].filter(Boolean).join(' · ')}
+                  : synchro.statut === 'bloque' || synchro.statut === 'attente-migration'
+                    ? `${etat.libelle} — voir le bandeau en haut de page.`
+                    : [etat.libelle, synchro.statut === 'synchro' ? depuis(synchro.majLe) : null]
+                        .filter(Boolean)
+                        .join(' · ')}
               </p>
 
               <button

@@ -75,7 +75,9 @@ export default function ItemCard({ item, statut, index = 0, montrerPersonnage = 
             </h3>
             <p className="mt-1 font-rune text-[0.65rem] uppercase tracking-[0.14em] text-gray-500">
               {item.slot}
-              {montrerPersonnage && build ? ` · ${build.personnage}` : ''}
+              {montrerPersonnage && build
+                ? ` · ${(item.roles ?? [item.personnage]).map((role) => buildDe(role)?.personnage ?? role).join(', ')}`
+                : ''}
             </p>
           </div>
           <BadgePriorite priorite={item.priorite} />

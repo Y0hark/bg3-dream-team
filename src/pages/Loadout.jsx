@@ -1,115 +1,328 @@
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useMemo } from 'react'
 import BarreProgression from '../components/BarreProgression.jsx'
 import EnteteSection from '../components/EnteteSection.jsx'
 import EtatVide from '../components/EtatVide.jsx'
 import LienExterne from '../components/LienExterne.jsx'
 import Revelation from '../components/Revelation.jsx'
-import { BadgeActe, BadgePriorite, BadgeStatut } from '../components/Badges.jsx'
-import { BUILDS } from '../data/builds.js'
-import { ITEMS } from '../data/items.js'
+import SuiviCopies from '../components/SuiviCopies.jsx'
+import { BadgeActe, BadgeStatut } from '../components/Badges.jsx'
+import { ACTES } from '../data/actes.js'
+import { BUILDS, COPIES_AUTORISEES } from '../data/builds.js'
+import { RANGS, SLOTS_LOADOUT, loadoutsDe } from '../data/loadouts.js'
 import { lieuDe } from '../data/lieux.js'
+import { objetDe } from '../data/objets.js'
 import { accentDe, variableAccent } from '../lib/accents.js'
-import { compter, estResolu, statutDe, trierItems } from '../lib/progression.js'
+import { completudeLoadout, estResolu, statutDe } from '../lib/progression.js'
 import useProgression from '../hooks/useProgression.jsx'
 
-/** Tableau du loadout d'un personnage : un slot par ligne, statut cliquable. */
-function TableauLoadout({ items, etat, basculerItem }) {
+const LIBELLES_RANG = {
+  principal: 'Principal',
+  alternative: 'Alternative',
+  situationnel: 'Situationnel',
+  reserve: 'Réserve',
+}
+
+const TEINTES_RANG = {
+  principal: 'border-amber-300/50 text-amber-100 bg-amber-400/10',
+  alternative: 'border-sky-400/45 text-sky-200 bg-sky-500/10',
+  situationnel: 'border-purple-400/40 text-purple-200',
+  reserve: 'border-or-700/40 text-gray-400',
+}
+
+const VERROUS = {
+  quete: 'Dépend d’une quête',
+  pnj: 'Dépend d’un PNJ (peut disparaître)',
+  'zone-dangereuse': 'Zone dangereuse',
+  'point-de-non-retour': 'Point de non-retour : à prendre avant de partir',
+  'ressource-unique': 'Ressource unique de la run',
+}
+
+function ordre(ligne) {
+  return SLOTS_LOADOUT.indexOf(ligne.slot) * 10 + RANGS.indexOf(ligne.rang)
+}
+
+function BadgeRang({ rang }) {
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[46rem] border-collapse text-left">
-        <thead>
-          <tr className="border-b border-or-700/25">
-            {['Obtenu', 'Slot', 'Item', 'Acte', 'Priorité', 'Lieu', 'Statut'].map((entete) => (
-              <th key={entete} scope="col" className="glyphe px-3 py-2">
-                {entete}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item) => {
-            const statut = statutDe(etat, item.id)
-            const lieu = lieuDe(item.lieu)
-            return (
-              <tr
-                key={item.id}
-                className={`border-b border-or-700/15 transition-colors hover:bg-voile/[0.03] ${
-                  estResolu(statut) ? 'opacity-70' : ''
-                }`}
-              >
-                <td className="px-3 py-3">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 accent-current"
-                    checked={statut === 'obtenu'}
-                    onChange={() => basculerItem(item.id)}
-                    aria-label={`Marquer ${item.nom} comme obtenu`}
-                  />
-                </td>
-                <td className="px-3 py-3 font-rune text-[0.68rem] uppercase tracking-[0.12em] text-gray-500">
-                  {item.slot}
-                </td>
-                <td className="px-3 py-3">
-                  <span
-                    className={`text-sm ${statut === 'rate' ? 'text-red-300 line-through' : 'text-gray-200'}`}
-                  >
-                    {item.nom}
-                  </span>
-                  {item.aConfirmer && (
-                    <span
-                      className="ml-2 font-rune text-[0.6rem] uppercase tracking-[0.12em] text-gray-500"
-                      title="La source dépend d’un aléa de run : à vérifier sur place"
-                    >
-                      · source à confirmer
-                    </span>
-                  )}
-                  <br />
-                  <LienExterne href={item.wiki}>Wiki</LienExterne>
-                </td>
-                <td className="px-3 py-3">
-                  <BadgeActe numero={item.acte} />
-                </td>
-                <td className="px-3 py-3">
-                  <BadgePriorite priorite={item.priorite} />
-                </td>
-                <td className="px-3 py-3 text-sm text-gray-400">
-                  {lieu ? lieu.nom : 'À localiser'}
-                </td>
-                <td className="px-3 py-3">
-                  <BadgeStatut statut={statut} />
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
+    <span
+      className={`inline-flex items-center rounded-full border px-2.5 py-1 font-rune text-[0.62rem] uppercase tracking-[0.14em] ${TEINTES_RANG[rang]}`}
+    >
+      {LIBELLES_RANG[rang]}
+    </span>
+  )
+}
+
+/** Où et à quel prix l'obtenir : sources, rattrapage et risque de verrouillage. */
+function Acquisition({ objet }) {
+  return (
+    <ul className="space-y-1 text-xs text-gray-400">
+      {objet.sources.map((source, index) => {
+        const lieu = lieuDe(source.lieu)
+        return (
+          <li key={index}>
+            <span className="text-gray-300">{source.rattrapage ? 'Rattrapage' : 'Source'} · Acte {source.acte}</span>
+            {' — '}
+            {lieu ? lieu.nom : 'À localiser'}
+            {source.aConfirmer && ' · à confirmer'}
+            {source.verrou !== 'aucun' && (
+              <span className="ml-1 text-amber-200">⚠ {VERROUS[source.verrou]}</span>
+            )}
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
+function Designation({ ligne, objet }) {
+  if (!objet) {
+    return (
+      <div>
+        <span className="text-sm text-gray-400">Libre</span>
+        <p className="mt-1 text-xs text-gray-500">{ligne.interet}</p>
+      </div>
+    )
+  }
+  return (
+    <div>
+      <span className="text-sm text-gray-200">{objet.nom}</span>
+      <p className="mt-1 text-xs leading-relaxed text-gray-400">{ligne.interet}</p>
+      {ligne.condition && (
+        <p className="mt-1 text-xs leading-relaxed text-amber-200/90">
+          <span className="font-rune uppercase tracking-[0.12em]">Condition · </span>
+          {ligne.condition}
+        </p>
+      )}
+      <p className="mt-1">
+        <LienExterne href={objet.wiki}>Wiki</LienExterne>
+      </p>
+    </div>
+  )
+}
+
+function CaseObtenu({ objet, statut, basculerItem }) {
+  return (
+    <label className="flex items-center gap-2 text-xs text-gray-400">
+      <input
+        type="checkbox"
+        className="h-4 w-4 accent-current"
+        checked={statut === 'obtenu'}
+        onChange={() => basculerItem(objet.id)}
+        aria-label={`Marquer l’original de ${objet.nom} comme obtenu`}
+      />
+      <BadgeStatut statut={statut} />
+    </label>
+  )
+}
+
+function LignesRole({ lignes, role, acte, etat, basculerItem }) {
+  return (
+    <>
+      {/* Desktop : un tableau, un slot par ligne. */}
+      <div className="hidden overflow-x-auto md:block" data-vue="tableau">
+        <table className="w-full min-w-[58rem] border-collapse text-left">
+          <thead>
+            <tr className="border-b border-or-700/25">
+              {['Slot', 'Recommandation', 'Rang', 'Acquisition', 'Original', 'Copies et équipement'].map((entete) => (
+                <th key={entete} scope="col" className="glyphe px-3 py-2">
+                  {entete}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {lignes.map((ligne, index) => {
+              const objet = ligne.objet ? objetDe(ligne.objet) : null
+              const statut = objet ? statutDe(etat, objet.id) : null
+              return (
+                <tr
+                  key={`${ligne.slot}-${ligne.objet}-${index}`}
+                  className={`border-b border-or-700/15 align-top ${statut && estResolu(statut) ? 'opacity-80' : ''}`}
+                >
+                  <td className="px-3 py-3 font-rune text-[0.68rem] uppercase tracking-[0.12em] text-gray-500">
+                    {ligne.slot}
+                  </td>
+                  <td className="px-3 py-3">
+                    <Designation ligne={ligne} objet={objet} />
+                  </td>
+                  <td className="px-3 py-3">
+                    <BadgeRang rang={ligne.rang} />
+                  </td>
+                  <td className="px-3 py-3">{objet && <Acquisition objet={objet} />}</td>
+                  <td className="px-3 py-3">
+                    {objet && <CaseObtenu objet={objet} statut={statut} basculerItem={basculerItem} />}
+                  </td>
+                  <td className="px-3 py-3">
+                    {objet && ligne.rang === 'principal' ? (
+                      <SuiviCopies objet={objet} role={role} acte={acte} />
+                    ) : (
+                      objet && <span className="text-xs text-gray-500">Option : pas comptée dans l’équipement du plan.</span>
+                    )}
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile : une carte par slot, rien à faire défiler latéralement. */}
+      <ul className="space-y-3 md:hidden" data-vue="cartes">
+        {lignes.map((ligne, index) => {
+          const objet = ligne.objet ? objetDe(ligne.objet) : null
+          const statut = objet ? statutDe(etat, objet.id) : null
+          return (
+            <li
+              key={`${ligne.slot}-${ligne.objet}-${index}`}
+              className="rounded border border-or-700/20 p-4"
+            >
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <span className="font-rune text-[0.68rem] uppercase tracking-[0.12em] text-gray-500">
+                  {ligne.slot}
+                </span>
+                <BadgeRang rang={ligne.rang} />
+              </div>
+              <Designation ligne={ligne} objet={objet} />
+              {objet && (
+                <div className="mt-3 space-y-3">
+                  <Acquisition objet={objet} />
+                  <CaseObtenu objet={objet} statut={statut} basculerItem={basculerItem} />
+                  {ligne.rang === 'principal' && <SuiviCopies objet={objet} role={role} acte={acte} />}
+                </div>
+              )}
+            </li>
+          )
+        })}
+      </ul>
+    </>
+  )
+}
+
+function Variantes({ build, variante, onChoisir }) {
+  const choisie = build.variantes.find((entree) => entree.id === variante)
+  return (
+    <div className="mb-5">
+      <label className="flex flex-wrap items-center gap-3 text-xs text-gray-400">
+        <span className="glyphe">Variante</span>
+        <select
+          className="rounded border border-or-700/30 bg-encre px-2 py-1 text-sm text-gray-200"
+          value={choisie ? choisie.id : ''}
+          onChange={(evenement) => onChoisir(evenement.target.value)}
+          aria-label={`Variante du build ${build.personnage}`}
+        >
+          <option value="">Build principal</option>
+          {build.variantes.map((entree) => (
+            <option key={entree.id} value={entree.id}>
+              {entree.nom}
+            </option>
+          ))}
+        </select>
+      </label>
+      {choisie && (
+        <div className="mt-3 rounded border border-or-700/20 p-4 text-xs leading-relaxed text-gray-300">
+          <p>{choisie.verdict}</p>
+          <p className="mt-2 text-gray-500">
+            Cette variante ne cumule pas ses bénéfices avec le build principal.
+          </p>
+        </div>
+      )}
     </div>
   )
 }
 
 export default function Loadout() {
   const { etat, basculerItem } = useProgression()
+  const [params, setParams] = useSearchParams()
 
-  const parPersonnage = useMemo(
+  const acteBrut = Number(params.get('acte'))
+  const acte = ACTES.some((entree) => entree.numero === acteBrut) ? acteBrut : 1
+  const roleBrut = params.get('role')
+  const rolesAffiches = BUILDS.some((build) => build.id === roleBrut)
+    ? BUILDS.filter((build) => build.id === roleBrut)
+    : BUILDS
+  const tousLesRangs = params.get('rang') === 'tous'
+  const varianteBrut = params.get('variante') ?? ''
+
+  function maj(cle, valeur, defaut) {
+    const suivant = new URLSearchParams(params)
+    if (!valeur || valeur === defaut) suivant.delete(cle)
+    else suivant.set(cle, valeur)
+    setParams(suivant, { replace: true })
+  }
+
+  const parRole = useMemo(
     () =>
-      BUILDS.map((build) => {
-        const items = trierItems(ITEMS.filter((item) => item.personnage === build.id))
-        return { build, items, progression: compter(items, etat) }
+      rolesAffiches.map((build) => {
+        const lignes = loadoutsDe(build.id, acte)
+          .filter((ligne) => tousLesRangs || ligne.rang === 'principal' || ligne.variante === varianteBrut)
+          .sort((a, b) => ordre(a) - ordre(b))
+        return { build, lignes, completude: completudeLoadout(build.id, etat, acte) }
       }),
-    [etat],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [rolesAffiches.map((build) => build.id).join(), acte, tousLesRangs, varianteBrut, etat],
   )
+
+  const actifs = BUILDS.length
 
   return (
     <div className="mx-auto max-w-grimoire px-5 py-12 sm:py-16">
       <EnteteSection
-        surtitre="Par personnage"
+        surtitre="Par rôle et par acte"
         titre="Loadouts cibles"
-        chapeau="Le plan d’équipement final, slot par slot. La case à cocher bascule l’item entre « À récupérer » et « Obtenu » ; les statuts « Raté » et « Remplacé » se posent depuis le catalogue."
+        chapeau="Le plan d’équipement, acte par acte et slot par slot. L’original d’un objet, les exemplaires disponibles et l’exemplaire réellement affecté à un rôle sont suivis séparément : obtenir l’original n’équipe aucun des quatre rôles."
       />
 
+      {COPIES_AUTORISEES && (
+        <p className="plaque mb-6 px-5 py-4 text-xs leading-relaxed text-gray-300">
+          Copies d’équipement autorisées (Ombrecœur / Invocation de réplique). Elles ne dupliquent ni le Cheveu, ni les
+          bonus permanents, ni les élixirs, et ne lèvent pas les limites de slots : une amulette, une cape, deux anneaux
+          par personnage. Leurs passifs et leur persistance sont à valider sur la version installée.
+        </p>
+      )}
+
+      <form className="mb-8 flex flex-wrap items-end gap-4" aria-label="Filtres du loadout" onSubmit={(e) => e.preventDefault()}>
+        <label className="text-xs text-gray-400">
+          <span className="glyphe mb-1 block">Acte</span>
+          <select
+            className="rounded border border-or-700/30 bg-encre px-2 py-1 text-sm text-gray-200"
+            value={acte}
+            onChange={(evenement) => maj('acte', evenement.target.value, '1')}
+          >
+            {ACTES.map((entree) => (
+              <option key={entree.numero} value={entree.numero}>
+                {entree.nom}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="text-xs text-gray-400">
+          <span className="glyphe mb-1 block">Rôle</span>
+          <select
+            className="rounded border border-or-700/30 bg-encre px-2 py-1 text-sm text-gray-200"
+            value={rolesAffiches.length === actifs ? '' : rolesAffiches[0].id}
+            onChange={(evenement) => maj('role', evenement.target.value, '')}
+          >
+            <option value="">Les {actifs} rôles</option>
+            {BUILDS.map((build) => (
+              <option key={build.id} value={build.id}>
+                {build.personnage}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="flex items-center gap-2 pb-1 text-xs text-gray-400">
+          <input
+            type="checkbox"
+            className="h-4 w-4 accent-current"
+            checked={tousLesRangs}
+            onChange={(evenement) => maj('rang', evenement.target.checked ? 'tous' : '', '')}
+          />
+          Montrer alternatives, situationnels et réserves
+        </label>
+      </form>
+
       <div className="space-y-8">
-        {parPersonnage.map(({ build, items, progression }, index) => {
+        {parRole.map(({ build, lignes, completude }, index) => {
           const accent = accentDe(build)
           return (
             <Revelation
@@ -131,26 +344,36 @@ export default function Loadout() {
                       {build.personnage} — {build.nom}
                     </Link>
                     <p className="mt-1 font-rune text-[0.62rem] uppercase tracking-[0.14em] text-gray-500">
-                      {build.split}
+                      {build.split} · <BadgeActe numero={acte} />
                     </p>
                   </div>
                 </div>
                 <BarreProgression
                   className="w-full max-w-xs"
-                  libelle="Items sécurisés"
-                  detail={`${progression.resolus}/${progression.total}`}
-                  pourcentage={progression.pourcentage}
+                  libelle="Équipé"
+                  detail={`${completude.equipes}/${completude.total}`}
+                  pourcentage={completude.pourcentage}
                   teinte={accent.barre}
                 />
               </header>
 
-              {items.length === 0 ? (
+              <p className="mb-4 text-xs text-gray-500">
+                {completude.aAcquerir} à acquérir · {completude.aAffecter} obtenu(s) à affecter · {completude.equipes} équipé(s)
+              </p>
+
+              <Variantes
+                build={build}
+                variante={varianteBrut}
+                onChoisir={(valeur) => maj('variante', valeur, '')}
+              />
+
+              {lignes.length === 0 ? (
                 <EtatVide
-                  titre="Loadout à encoder"
-                  message="Aucun item du catalogue n’est rattaché à ce personnage."
+                  titre="Rien à cet acte"
+                  message="Aucune recommandation n’est encodée pour ce rôle à cet acte."
                 />
               ) : (
-                <TableauLoadout items={items} etat={etat} basculerItem={basculerItem} />
+                <LignesRole lignes={lignes} role={build.id} acte={acte} etat={etat} basculerItem={basculerItem} />
               )}
             </Revelation>
           )

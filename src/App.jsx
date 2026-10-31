@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
+import BanniereMigration from './components/BanniereMigration.jsx'
 import BanniereStockage from './components/BanniereStockage.jsx'
 import FondAnime from './components/FondAnime.jsx'
 import Navbar from './components/Navbar.jsx'
@@ -13,6 +14,7 @@ import Loadout from './pages/Loadout.jsx'
 import Items from './pages/Items.jsx'
 import Lieux from './pages/Lieux.jsx'
 import Checklist from './pages/Checklist.jsx'
+import Archive from './pages/Archive.jsx'
 import NonTrouvee from './pages/NonTrouvee.jsx'
 
 /**
@@ -43,6 +45,7 @@ export default function App() {
       <div className="couche-contenu flex min-h-screen flex-col">
         <RestaurerLeScroll />
         <BanniereStockage />
+        <BanniereMigration />
         <Navbar />
         <main key={pathname} className="entree-page flex-1">
           <Routes>
@@ -53,6 +56,7 @@ export default function App() {
             <Route path="/items" element={<Items />} />
             <Route path="/lieux" element={<Lieux />} />
             <Route path="/checklist" element={<Checklist />} />
+            <Route path="/archive" element={<Archive />} />
             <Route path="*" element={<NonTrouvee />} />
           </Routes>
         </main>

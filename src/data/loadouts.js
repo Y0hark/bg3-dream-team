@@ -16,7 +16,8 @@
 //   (« rien d'indispensable à acheter ») ;
 // - rang : principal | alternative | situationnel | reserve ;
 // - interet : pourquoi ; condition : ce qui doit être vrai pour que l'effet
-//   existe (null si aucune).
+//   existe (null si aucune) ;
+// - variante : id d'une variante de builds.js illustrée par la ligne (ou null).
 //
 // Seul le rang `principal` est contraint par les limites de slots : une
 // amulette, une cape, une armure, deux anneaux par personnage. Une
@@ -77,6 +78,8 @@ const e = (slot, objet, rang, interet, options = {}) => ({
   interet,
   condition: options.si ?? null,
   jusquA: options.jusqua ?? null,
+  // Id d'une variante de builds.js que cette ligne illustre (sinon null).
+  variante: options.variante ?? null,
 })
 
 const LIBRE = (slot, interet, options = {}) => e(slot, null, P, interet, options)
@@ -249,7 +252,7 @@ export const LOADOUTS = [
     e('Casque', 'haste-helm', A, 'Option de mobilité.'),
     e('Gants', 'gloves-soul-catching', P, '+1d10 force, +2 CON, soin de 10 PV après un coup.', { si: 'Hope et Raphael résolus avec une équipe préparée.' }),
     e('Gants', 'flawed-helldusk-gloves', A, 'À garder jusqu’à l’obtention de Soul Catching.'),
-    e('Gants', 'gauntlets-hill-giant-strength', A, 'FOR 23 sans élixir, au prix de Soul Catching.', { si: 'Variante autonome : mains occupées.' }),
+    e('Gants', 'gauntlets-hill-giant-strength', A, 'FOR 23 sans élixir, au prix de Soul Catching.', { si: 'Variante autonome : mains occupées.', variante: 'moine-gantelets-collines' }),
     e('Bottes', 'boots-uninhibited-kushigo', P, 'Ajoutent le modificateur de SAG aux dégâts à mains nues.', { si: 'Ramassées sur Lir’i’c avant de repartir du Plan astral.' }),
     e('Bottes', 'disintegrating-night-walkers', A, 'Mobilité, mais perte du bonus de SAG par frappe.'),
     e('Cape', 'cloak-of-displacement', P, 'Désavantage aux attaques contre le porteur.'),

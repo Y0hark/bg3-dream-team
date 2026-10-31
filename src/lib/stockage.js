@@ -36,6 +36,31 @@ export function lire(cle) {
   }
 }
 
+/**
+ * Lecture qui DISTINGUE les cas que `lire` aplatit en null :
+ * - 'absent' : rien d'enregistré ;
+ * - 'ok' : valeur JSON relue ;
+ * - 'illisible' : quelque chose est stocké mais n'est pas du JSON — à ne pas
+ *   écraser, c'est peut-être la seule copie de la progression ;
+ * - 'indisponible' : le stockage lui-même refuse l'accès (navigation privée).
+ */
+export function lireStrict(cle) {
+  let texte
+  try {
+    texte = window.localStorage.getItem(cle)
+  } catch {
+    return { statut: 'indisponible', valeur: null, texte: null }
+  }
+  if (texte === null || texte === undefined || texte === '') {
+    return { statut: 'absent', valeur: null, texte: null }
+  }
+  try {
+    return { statut: 'ok', valeur: JSON.parse(texte), texte }
+  } catch {
+    return { statut: 'illisible', valeur: null, texte }
+  }
+}
+
 export function ecrire(cle, valeur) {
   try {
     window.localStorage.setItem(cle, JSON.stringify(valeur))

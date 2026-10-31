@@ -7,6 +7,7 @@ import ItemCard from '../components/ItemCard.jsx'
 import BarreProgression from '../components/BarreProgression.jsx'
 import Revelation from '../components/Revelation.jsx'
 import { BadgeActe } from '../components/Badges.jsx'
+import { buildDe } from '../data/builds.js'
 import { ITEMS } from '../data/items.js'
 import {
   FILTRES_VIDES,
@@ -80,7 +81,11 @@ export default function Items() {
       {resultats.length === 0 ? (
         <EtatVide
           titre="Aucun item ne correspond"
-          message="Aucun item du catalogue ne satisfait cette combinaison de filtres. Élargissez la recherche ou réinitialisez les filtres."
+          message={
+            buildDe(filtres.personnage)?.ancienne
+              ? 'Ce filtre vise un build de l’ancienne composition, qui n’a plus d’objets dans le catalogue actif. Ses données sont consultables dans l’archive.'
+              : 'Aucun item du catalogue ne satisfait cette combinaison de filtres. Élargissez la recherche ou réinitialisez les filtres.'
+          }
           action={
             <button type="button" className="bouton mt-2" onClick={() => setFiltres(FILTRES_VIDES)}>
               Réinitialiser les filtres

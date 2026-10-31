@@ -48,6 +48,18 @@ export function normaliserSuivi(brut) {
   return suivi
 }
 
+/** Normalise la table des suivis (id d'objet → suivi) venue du stockage. */
+export function normaliserCopies(brut) {
+  const copies = {}
+  if (brut === null || typeof brut !== 'object' || Array.isArray(brut)) return copies
+  for (const [id, suivi] of Object.entries(brut)) {
+    const propre = normaliserSuivi(suivi)
+    // Un suivi vide est le défaut : on ne le stocke pas.
+    if (propre.exemplaires > 0 || propre.affectes.length > 0) copies[id] = propre
+  }
+  return copies
+}
+
 /** Rôles qui ont l'objet en rang principal à un acte donné. */
 export function besoinsObjet(objetId, acte, loadouts = LOADOUTS) {
   const roles = new Set()

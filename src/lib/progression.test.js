@@ -59,12 +59,32 @@ describe('normaliserEtat', () => {
       checklist: { x: true, y: 'oui' },
       parasite: 'ignoré',
     })
-    expect(nettoye).toEqual({ items: { a: 'obtenu' }, checklist: { x: true } })
+    expect(nettoye.items).toEqual({ a: 'obtenu' })
+    expect(nettoye.checklist).toEqual({ x: true })
+    expect(nettoye).not.toHaveProperty('parasite')
+  })
+
+  it('porte le schéma, la composition, les copies et l’archive', () => {
+    const initial = etatInitial()
+    expect(initial.schema).toBe(2)
+    expect(initial.composition).toBe('honneur-v2')
+    expect(initial.copies).toEqual({})
+    expect(initial.archive).toEqual({ items: {}, checklist: {} })
+  })
+
+  it('nettoie les copies et l’archive sans rien casser', () => {
+    const propre = normaliserEtat({
+      copies: { 'cloak-of-protection': { exemplaires: 2, affectes: ['sorcier-feu'] }, vide: { exemplaires: 0 }, faux: 12 },
+      archive: { items: { ancien: 'obtenu', mauvais: 'inconnu' }, checklist: { vieux: true } },
+    })
+    expect(Object.keys(propre.copies)).toEqual(['cloak-of-protection'])
+    expect(propre.archive).toEqual({ items: { ancien: 'obtenu' }, checklist: { vieux: true } })
   })
 
   it('accepte un stockage vide ou invalide', () => {
     expect(normaliserEtat(null)).toEqual(etatInitial())
     expect(normaliserEtat('nope')).toEqual(etatInitial())
+    expect(normaliserEtat([1, 2])).toEqual(etatInitial())
   })
 })
 
