@@ -55,6 +55,11 @@ function derive(objet) {
   return {
     id: objet.id,
     nom: objet.nom,
+    nomFr: objet.nomFr,
+    sourceNomFr: objet.sourceNomFr,
+    effet: objet.effet,
+    icone: objet.icone,
+    usages: objet.usages,
     slot: objet.slot,
     acte,
     personnage: proprietaire,

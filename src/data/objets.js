@@ -27,6 +27,8 @@
 // dégâts. C'est ce champ qui empêche de recopier Caustic Band sur des poings.
 // ------------------------------------------------------------------
 
+import { ICONES, NOMS_FR, USAGES_OBJETS } from './objets-meta.js'
+
 const wiki = (page) => (page === null ? null : 'https://bg3.wiki/wiki/' + page)
 
 const src = (acte, lieu, texte, extra = {}) => ({
@@ -68,7 +70,7 @@ export const SLOTS_OBJET = [
 
 const TOUS_DEGATS = ['arme', 'poings', 'sorts']
 
-export const OBJETS = [
+const OBJETS_BRUTS = [
   // ================================================================
   // Armes
   // ================================================================
@@ -490,6 +492,16 @@ export const OBJETS = [
     'Fixe la FOR à 23 : supprime le besoin d’élixir et libère son slot, mais occupe les mains à la place de Soul Catching (perte du +1d10 force par frappe et du soin associé).',
     [src(3, 'maison-de-lespoir', 'Archives de la Maison de l’Espoir.', { verrou: 'zone-dangereuse' })]),
 ]
+
+// Fusion des métadonnées (objets-meta.js) : nom FR officiel vérifié, icône
+// vérifiée et usages. `nomFr` / `icone` valent null tant que rien n'est vérifié.
+export const OBJETS = OBJETS_BRUTS.map((entree) => ({
+  ...entree,
+  nomFr: NOMS_FR[entree.id]?.nom ?? null,
+  sourceNomFr: NOMS_FR[entree.id]?.source ?? null,
+  icone: ICONES[entree.id] ?? null,
+  usages: USAGES_OBJETS[entree.id] ?? [],
+}))
 
 export function objetDe(id) {
   return OBJETS.find((entree) => entree.id === id) ?? null
