@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import BarreProgression from '../components/BarreProgression.jsx'
 import EnteteSection from '../components/EnteteSection.jsx'
 import EtatVide from '../components/EtatVide.jsx'
+import InventaireRole, { SelecteurActe } from '../components/InventaireRole.jsx'
 import LienExterne from '../components/LienExterne.jsx'
 import Revelation from '../components/Revelation.jsx'
 import SuiviCopies from '../components/SuiviCopies.jsx'
@@ -281,20 +282,10 @@ export default function Loadout() {
       )}
 
       <form className="mb-8 flex flex-wrap items-end gap-4" aria-label="Filtres du loadout" onSubmit={(e) => e.preventDefault()}>
-        <label className="text-xs text-gray-400">
-          <span className="glyphe mb-1 block">Acte</span>
-          <select
-            className="rounded border border-or-700/30 bg-encre px-2 py-1 text-sm text-gray-200"
-            value={acte}
-            onChange={(evenement) => maj('acte', evenement.target.value, '1')}
-          >
-            {ACTES.map((entree) => (
-              <option key={entree.numero} value={entree.numero}>
-                {entree.nom}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div>
+          <span className="glyphe mb-1 block text-xs">Acte</span>
+          <SelecteurActe acte={acte} onChoisir={(numero) => maj('acte', String(numero), '1')} />
+        </div>
         <label className="text-xs text-gray-400">
           <span className="glyphe mb-1 block">Rôle</span>
           <select
@@ -367,14 +358,23 @@ export default function Loadout() {
                 onChoisir={(valeur) => maj('variante', valeur, '')}
               />
 
-              {lignes.length === 0 ? (
-                <EtatVide
-                  titre="Rien à cet acte"
-                  message="Aucune recommandation n’est encodée pour ce rôle à cet acte."
-                />
-              ) : (
-                <LignesRole lignes={lignes} role={build.id} acte={acte} etat={etat} basculerItem={basculerItem} />
-              )}
+              <InventaireRole role={build.id} acte={acte} accent={accent} />
+
+              <details className="mt-6 rounded border border-or-700/20 p-4" data-detail-suivi>
+                <summary className="min-h-[44px] cursor-pointer font-rune text-xs uppercase tracking-[0.14em] text-or-300">
+                  Suivi détaillé : obtention, copies et équipement
+                </summary>
+                <div className="mt-4">
+                  {lignes.length === 0 ? (
+                    <EtatVide
+                      titre="Rien à cet acte"
+                      message="Aucune recommandation n’est encodée pour ce rôle à cet acte."
+                    />
+                  ) : (
+                    <LignesRole lignes={lignes} role={build.id} acte={acte} etat={etat} basculerItem={basculerItem} />
+                  )}
+                </div>
+              </details>
             </Revelation>
           )
         })}

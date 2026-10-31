@@ -75,8 +75,19 @@ Pour remplir : ajouter une entrée dans `NOMS_FR` / `ICONES` ; aucun autre chang
 
 Réutiliser : catalogue `objets.js`, loadouts, `copies.js`, `caracteristiquesEffectives`, migration `sauvegarde.js`.
 Adapter : `items.js` (champs FR/icône/usages), `filtrerItems` (recherche bilingue), `ItemCard` (icône + nom FR/EN).
-Manque (tickets suivants) : interface de choix d'alternatives (2), alertes (3), affectation d'exemplaires (4), affichage des étapes de caractéristiques dans `BuildPage` (suite), traduction FR officielle et icônes (sources à clarifier).
+Livré au ticket 2 : inventaire visuel par acte (`lib/inventaire.js`, `components/InventaireRole.jsx`), choix d'alternatives (`choisirAlternative`), vues de caractéristiques (`PanneauCaracteristiques`).
+Manque (tickets suivants) : alertes d'acquisition (3), affectation d'exemplaires (4), affichage des étapes de caractéristiques dans `BuildPage` (suite), traduction FR officielle et icônes (sources à clarifier).
 
 ## 9. Surfaces à texte utilisateur (à traduire / auditer)
 
 Navigation (`Navbar`), `Dashboard`, `BuildPage`, `Builds`, `Loadout`, `Items` (+ `FiltresItems`, `ItemCard`), `Lieux`, `Checklist`, `Archive`, `Footer`, bannières stockage/migration. Les noms d'objets, de sorts et de capacités restent en anglais faute de traduction officielle vérifiée (repli justifié) ; l'interface est en français.
+
+## 10. Inventaire visuel et choix d'alternatives (ticket UX 2/5)
+
+- **Clé de choix par emplacement** : `role|acte|slot`, avec suffixe `#n` à partir du second emplacement d'un slot multiple (`Anneau#2`). Le premier emplacement garde la clé du ticket 1 : aucune migration. `normaliserChoix` écarte `#1`, `#3` et tout suffixe sur un slot à un seul emplacement.
+- **Revenir à la référence** supprime la clé (`avecChoix`) ; un choix égal à la référence n'est jamais stocké.
+- **Trois libellés distincts** : « Prévu pour l'acte » (plan + alternative choisie), original obtenu (`etat.items`), « Équipé dans la run » (`copies[objet].affectes` contient le rôle). Choisir une alternative ou changer d'acte n'écrit ni `items` ni `copies` (testé).
+- **États d'emplacement** : `vide` (aucun objet voulu), `prevu`, `disponible` (original obtenu, non affecté), `equipe`.
+- **Compatibilité** : les données n'encodent ni prise en main ni maîtrises ; l'interface signale « à vérifier » (arme + bouclier, Moine Main ouverte) et n'affirme jamais une compatibilité.
+- **Alertes d'acquisition** : lues dans `objet.sources` (verrou, `aConfirmer`, lieu absent). Une condition non renseignée reste inconnue ; la logique du ticket 3 n'est pas réimplémentée.
+- **Caractéristiques** : vues Création / Progression / Respécialisation / Équipement / Export utilisateur, uniquement quand les données existent ; l'ordre de progression Paladin non confirmé reste signalé.

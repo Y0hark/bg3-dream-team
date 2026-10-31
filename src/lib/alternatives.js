@@ -16,7 +16,7 @@
 // - transition    : rang réserve — usage ponctuel avant d'équiper la
 //                   référence.
 // ------------------------------------------------------------------
-import { LOADOUTS, SLOTS_LOADOUT } from '../data/loadouts.js'
+import { LIMITES_SLOTS, LOADOUTS, SLOTS_LOADOUT } from '../data/loadouts.js'
 import { objetDe } from '../data/objets.js'
 
 export const NATURES = {
@@ -105,16 +105,41 @@ export function lignesSansContexte() {
 // erreur, jamais un reset. La possession reste dans `items`, l'équipement
 // dans `copies` : un choix ne modifie ni l'un ni l'autre.
 
-export const cleChoix = (role, acte, slot) => `${role}|${acte}|${slot}`
+// Un slot porté en plusieurs exemplaires (Anneau ×2) a une clé par
+// emplacement : « Anneau » pour le premier, « Anneau#2 » pour le second.
+export const cleChoix = (role, acte, slot, indice = 0) =>
+  `${role}|${acte}|${slot}${indice > 0 ? `#${indice + 1}` : ''}`
+
+function decouperSlot(brut) {
+  const [slot, rang] = String(brut).split('#')
+  const indice = rang === undefined ? 0 : Number(rang) - 1
+  const valide = Number.isInteger(indice) && indice >= 0 && indice < (LIMITES_SLOTS[slot] ?? 1)
+  return { slot, indice, valide: valide && (rang === undefined || indice > 0) }
+}
 
 export function normaliserChoix(brut) {
   const choix = {}
   if (brut === null || typeof brut !== 'object' || Array.isArray(brut)) return choix
   for (const [cle, objetId] of Object.entries(brut)) {
-    const [role, acteBrut, slot] = cle.split('|')
+    const [role, acteBrut, slotBrut] = cle.split('|')
     const acte = Number(acteBrut)
-    if (typeof objetId !== 'string' || !SLOTS_LOADOUT.includes(slot)) continue
+    const { slot, valide } = decouperSlot(slotBrut)
+    if (typeof objetId !== 'string' || !valide || !SLOTS_LOADOUT.includes(slot)) continue
     if (lignesDuSlot(role, acte, slot).some((ligne) => ligne.objet === objetId)) choix[cle] = objetId
   }
   return choix
+}
+
+/**
+ * Nouveau jeu de choix après sélection d'un objet pour un emplacement.
+ * `objetId` null, ou égal à la référence de l'emplacement, revient à la
+ * référence (la clé disparaît : l'état reste compact). Ne touche ni
+ * `items` ni `copies`.
+ */
+export function avecChoix(choix, role, acte, slot, indice, objetId, referenceId = null) {
+  const suivant = { ...choix }
+  const cle = cleChoix(role, acte, slot, indice)
+  if (!objetId || objetId === referenceId) delete suivant[cle]
+  else suivant[cle] = objetId
+  return normaliserChoix(suivant)
 }
