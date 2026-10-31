@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import BarreProgression from '../components/BarreProgression.jsx'
 import EnteteSection from '../components/EnteteSection.jsx'
+import RecapZone from '../components/RecapZone.jsx'
 import LienExterne from '../components/LienExterne.jsx'
 import Revelation from '../components/Revelation.jsx'
 import { BadgeActe } from '../components/Badges.jsx'
@@ -31,6 +32,8 @@ export default function Lieux() {
         titre="Cartes & lieux"
         chapeau="Les zones qui portent le loadout de la run. Aucune carte du jeu n’est copiée ici : chaque zone renvoie vers le wiki communautaire et vers une carte interactive externe."
       />
+
+      <RecapZone />
 
       {ACTES.map((acte) => {
         const lieux = LIEUX.filter((lieu) => lieu.acte === acte.numero)

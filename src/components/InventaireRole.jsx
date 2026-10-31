@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { BadgesAcquisition } from './AlertesAcquisition.jsx'
 import Dialogue from './Dialogue.jsx'
 import FicheObjet, { ApercuObjet } from './FicheObjet.jsx'
 import IconeObjet from './IconeObjet.jsx'
@@ -81,6 +82,7 @@ function Emplacement({ emplacement, onFiche, onOptions, onApercu }) {
               </span>
             )}
           </span>
+          {objet && <BadgesAcquisition objetId={objet.id} className="mt-1" />}
         </span>
       </button>
       <button
