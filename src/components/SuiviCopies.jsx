@@ -19,7 +19,7 @@ const ORIGINAL = {
  * attendent encore un exemplaire à cet acte.
  */
 export default function SuiviCopies({ objet, role, acte }) {
-  const { etat, ajouterExemplaire, affecterExemplaire, liberer, validerCopie } = useProgression()
+  const { etat, ajouterExemplaire, retirerExemplaire, affecterExemplaire, liberer, validerCopie } = useProgression()
   const statut = statutDe(etat, objet.id)
   const besoins = besoinsObjet(objet.id, acte)
   const vue = etatCopies(objet, statut, etat.copies?.[objet.id], besoins, REGLAGES_COPIES)
@@ -62,6 +62,11 @@ export default function SuiviCopies({ objet, role, acte }) {
           {objet.copiable && vue.copiePossible === 'oui' && (
             <button type="button" className="bouton" onClick={() => ajouterExemplaire(objet.id)}>
               + Copie
+            </button>
+          )}
+          {vue.exemplaires > 1 && vue.exemplaires - 1 >= vue.affectes.length && (
+            <button type="button" className="bouton" onClick={() => retirerExemplaire(objet.id)}>
+              − Copie
             </button>
           )}
         </div>

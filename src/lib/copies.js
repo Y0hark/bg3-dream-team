@@ -141,6 +141,27 @@ export function ajouterCopie(objet, statutOriginal, suivi, reglages = REGLAGES_C
 }
 
 /**
+ * Retire une copie (jamais l'original). Refuse si tous les exemplaires restants
+ * seraient insuffisants pour les affectations réelles : il faut d'abord libérer
+ * un porteur, sinon une affectation survivrait sans exemplaire.
+ */
+export function retirerCopie(objet, statutOriginal, suivi, reglages = REGLAGES_COPIES) {
+  const etat = etatCopies(objet, statutOriginal, suivi, [], reglages)
+  if (etat.exemplaires <= 1) return { ok: false, raison: 'original-uniquement' }
+  if (etat.exemplaires - 1 < etat.affectes.length) return { ok: false, raison: 'exemplaire-affecte' }
+  return {
+    ok: true,
+    suivi: { ...normaliserSuivi(suivi), exemplaires: etat.exemplaires - 1, affectes: etat.affectes },
+  }
+}
+
+/** Libère l'exemplaire d'un rôle. Sans effet si le rôle n'en porte pas. */
+export function liberer(suivi, role) {
+  const brut = normaliserSuivi(suivi)
+  return { ...brut, affectes: brut.affectes.filter((porteur) => porteur !== role) }
+}
+
+/**
  * Alertes d'exclusivité : un même objet en rang principal chez plusieurs
  * rôles au même acte. Avec les copies, ce n'est PAS un conflit — sauf pour un
  * objet non copiable (Cheveu, élixirs), où il le reste toujours.

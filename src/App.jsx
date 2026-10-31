@@ -10,6 +10,7 @@ import { FournisseurProgression } from './hooks/useProgression.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import Builds from './pages/Builds.jsx'
 import BuildPage from './pages/BuildPage.jsx'
+import Equipe from './pages/Equipe.jsx'
 import Loadout from './pages/Loadout.jsx'
 import Items from './pages/Items.jsx'
 import Lieux from './pages/Lieux.jsx'
@@ -52,6 +53,7 @@ export default function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/builds" element={<Builds />} />
             <Route path="/builds/:id" element={<BuildPage />} />
+            <Route path="/equipe" element={<Equipe />} />
             <Route path="/loadout" element={<Loadout />} />
             <Route path="/items" element={<Items />} />
             <Route path="/lieux" element={<Lieux />} />

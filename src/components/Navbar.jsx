@@ -5,6 +5,7 @@ import SynchroRun from './SynchroRun.jsx'
 const LIENS = [
   { to: '/', libelle: 'Dashboard', exact: true },
   { to: '/builds', libelle: 'Builds' },
+  { to: '/equipe', libelle: 'Équipe' },
   { to: '/loadout', libelle: 'Loadout' },
   { to: '/items', libelle: 'Items' },
   { to: '/lieux', libelle: 'Cartes & lieux' },

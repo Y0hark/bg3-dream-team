@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { objetDe } from '../data/objets.js'
 import { avecChoix } from '../lib/alternatives.js'
 import { avecEvenement, avecStatutAlerte, MODES_SPOILERS } from '../lib/acquisition-etat.js'
-import { affecter, ajouterCopie, normaliserSuivi } from '../lib/copies.js'
+import { affecter, ajouterCopie, liberer as libererSuivi, normaliserSuivi, retirerCopie } from '../lib/copies.js'
 import {
   etatInitial,
   normaliserEtat,
@@ -136,6 +136,18 @@ export function FournisseurProgression({ children }) {
     [modifierSuivi],
   )
 
+  const retirerExemplaire = useCallback(
+    (objetId) => {
+      const objet = objetDe(objetId)
+      if (!objet) return
+      modifierSuivi(objetId, (suivi, statut) => {
+        const resultat = retirerCopie(objet, statut, suivi)
+        return resultat.ok ? resultat.suivi : null
+      })
+    },
+    [modifierSuivi],
+  )
+
   const affecterExemplaire = useCallback(
     (objetId, roleId) => {
       const objet = objetDe(objetId)
@@ -150,10 +162,7 @@ export function FournisseurProgression({ children }) {
 
   const liberer = useCallback(
     (objetId, roleId) => {
-      modifierSuivi(objetId, (suivi) => ({
-        ...suivi,
-        affectes: suivi.affectes.filter((role) => role !== roleId),
-      }))
+      modifierSuivi(objetId, (suivi) => libererSuivi(suivi, roleId))
     },
     [modifierSuivi],
   )
@@ -405,6 +414,7 @@ export function FournisseurProgression({ children }) {
       confirmerMigration,
       exporterDonnees,
       ajouterExemplaire,
+      retirerExemplaire,
       affecterExemplaire,
       liberer,
       validerCopie,
@@ -431,6 +441,7 @@ export function FournisseurProgression({ children }) {
       confirmerMigration,
       exporterDonnees,
       ajouterExemplaire,
+      retirerExemplaire,
       affecterExemplaire,
       liberer,
       validerCopie,

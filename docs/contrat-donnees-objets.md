@@ -127,3 +127,13 @@ Navigation (`Navbar`), `Dashboard`, `BuildPage`, `Builds`, `Loadout`, `Items` (+
 - Kushigo : le wiki ne cite que Lir'i'c comme source, sans rattrapage ni point de non-retour explicite ; l'irréversibilité vient de la fiche d'équipe.
 - Dammon : le wiki ne dit pas que sa mort ferme son commerce ; aucune interdiction n'est affichée.
 - Non fait : lecture de sauvegarde BG3, guide exhaustif des quêtes, vérification visuelle sur appareil mobile réel.
+
+## 8. Vue d'équipe (ticket UX 4/5)
+
+Route `/equipe`, calculée par `lib/equipe.js` — aucun nouveau champ persisté, `VERSION_SCHEMA` inchangé.
+
+- Réutilise `etat.items` (original), `etat.copies` (exemplaires et affectations, `lib/copies.js`) et les plans de `inventaireRole` (alternatives comprises).
+- Invariants : équipé(objet) ≤ exemplaires(objet) ; un rôle apparaît au plus une fois dans `affectes` d'un objet ; un plan n'est jamais une affectation (« copie à préparer » = prévu, pas équipé) ; la possession est globale à la run, les plans sont indexés par acte.
+- Besoins distincts : `originalARecuperer` (aucun exemplaire) ≠ `copiesAPreparer` (exemplaires de plus, 0 si non copiable) ; `conflitUnique` pour un objet non copiable voulu par plusieurs porteurs.
+- Actions : affecter / libérer (réversibles), `+ Copie` / `− Copie` (`retirerCopie` refuse de retirer l'original ou une copie portée). Pas d'action « Équiper ce plan » : non nécessaire, l'affectation se fait objet par objet.
+- Un équipement réel qui dépasse la limite d'un slot est signalé (`depassementsEquipes`), jamais corrigé silencieusement.

@@ -46,6 +46,7 @@ le Paladin : aucun n'est généré pour le Moine ni le Sidekick.
 | `/` | Dashboard : progression du plan, équipement des loadouts, checklists, risques et urgences |
 | `/builds` | Les 4 cartes de build |
 | `/builds/:id` | Fiche : stats, dons, leveling 1 → 12, variantes, divergences, à confirmer, export, objets du plan |
+| `/equipe` | Vue d’équipe : les 4 rôles côte à côte par acte (plans, originaux, copies, exemplaires équipés) et ce qu’il reste à préparer |
 | `/loadout` | Loadouts par acte, par rôle et par variante, avec le suivi des copies |
 | `/items` | Catalogue filtrable (acte, rôle, priorité, statut, recherche), groupé par acte |
 | `/lieux` | Zones de la run avec liens wiki et cartes interactives externes |
