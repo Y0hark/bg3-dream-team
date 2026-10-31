@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { objetDe } from '../data/objets.js'
+import { avecChoix } from '../lib/alternatives.js'
 import { affecter, ajouterCopie, normaliserSuivi } from '../lib/copies.js'
 import {
   etatInitial,
@@ -162,6 +163,15 @@ export function FournisseurProgression({ children }) {
     },
     [modifierSuivi],
   )
+
+  // --- Choix d'alternatives : préférence de plan, ni possession ni équipement ---
+  // `objetId` null (ou égal à la référence) revient à la référence du plan.
+  const choisirAlternative = useCallback((role, acte, slot, indice, objetId, referenceId = null) => {
+    setEtat((precedent) => ({
+      ...precedent,
+      choixAlternatives: avecChoix(precedent.choixAlternatives, role, acte, slot, indice, objetId, referenceId),
+    }))
+  }, [])
 
   const definirStatut = useCallback((itemId, statut) => {
     const valide = statutValide(statut)
@@ -379,6 +389,7 @@ export function FournisseurProgression({ children }) {
       affecterExemplaire,
       liberer,
       validerCopie,
+      choisirAlternative,
     }),
     [
       etat,
@@ -401,6 +412,7 @@ export function FournisseurProgression({ children }) {
       affecterExemplaire,
       liberer,
       validerCopie,
+      choisirAlternative,
     ],
   )
 
