@@ -8,15 +8,22 @@
 // un nom n'est jamais déduit ni inventé. Sans entrée, l'interface retombe sur
 // le nom anglais (le nom en jeu), champ par champ.
 //
-// ICONES — { id: { fichier, source, licence, attribution } } : image locale
-// (sous public/icones/) dont la réutilisation est vérifiée. Vide tant que la
-// provenance et la licence d'aucune image ne sont clarifiées : l'interface
-// affiche alors l'icône de repli du type d'équipement, jamais une image
-// récupérée au hasard ni au runtime.
+// ICONES — { id: { fichier, source, licence, attribution, ... } } : image
+// locale (sous public/icones/) issue du BG3 Wiki, avec sa provenance. Elle est
+// dérivée de icones-wiki.json, produit par scripts/collecter-icones.mjs (outil
+// de préparation : le site ne contacte jamais le wiki). Un objet dont le
+// fichier n'a pas pu être résolu n'a pas d'entrée : l'interface affiche alors
+// l'icône de repli du type d'équipement, jamais une image devinée.
+//
+// Droits : ces sprites sont des assets de Larian Studios republiés par le wiki ;
+// ils ne sont PAS sous la licence libre du wiki (CC BY-SA). Le statut est donc
+// déclaré tel quel dans `licence`, jamais requalifié.
 //
 // USAGES — étiquettes d'usage d'un objet, d'après son effet décrit dans
 // objets.js : degats | defense | mobilite | controle | utilitaire.
 // ------------------------------------------------------------------
+
+import ICONES_WIKI from './icones-wiki.json' with { type: 'json' }
 
 export const USAGES = ['degats', 'defense', 'mobilite', 'controle', 'utilitaire']
 
@@ -30,7 +37,22 @@ export const NOMS_USAGES = {
 
 export const NOMS_FR = {}
 
-export const ICONES = {}
+const LICENCE_ICONE =
+  'Asset Larian Studios (© Larian Studios), republié par le BG3 Wiki : pas une licence libre ; usage de fan non commercial (BG3 Fan Content Policy)'
+
+export const ICONES = Object.fromEntries(
+  ICONES_WIKI.filter((ligne) => ligne.statut === 'ok').map((ligne) => [
+    ligne.id,
+    {
+      fichier: ligne.fichier,
+      source: ligne.pageFichier,
+      pageObjet: ligne.pageObjet,
+      licence: LICENCE_ICONE,
+      attribution: '© Larian Studios, via BG3 Wiki (bg3.wiki)',
+      typeVisuel: ligne.typeVisuel,
+    },
+  ]),
+)
 
 const D = 'degats'
 const F = 'defense'

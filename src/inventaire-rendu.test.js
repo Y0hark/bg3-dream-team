@@ -54,7 +54,7 @@ describe('inventaire visuel — rendu', () => {
   })
 
   it('l’icône sans image vérifiée retombe sur le glyphe du type, à dimensions fixes', () => {
-    const objet = objetDe('fistbreaker-helm')
+    const objet = { ...objetDe('fistbreaker-helm'), icone: null }
     const html = renderToString(createElement(IconeObjet, { objet, taille: 40 }))
     expect(html).not.toContain('<img')
     expect(html).toContain('width:40px')
