@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import LienExterne from './LienExterne.jsx'
-import { CATEGORIES, CONFIANCES, PORTEES, SEVERITES, evenementDe } from '../data/acquisition.js'
+import { CATEGORIES, CONFIANCES, PORTEES, SEVERITES } from '../data/acquisition.js'
 import { objetDe } from '../data/objets.js'
 import { buildDe } from '../data/builds.js'
-import { LIBELLE_A_VERIFIER, RESULTATS, alertesObjet, badgesObjet } from '../lib/acquisition.js'
+import { LIBELLE_A_VERIFIER, RESULTATS, alertesObjet, badgesObjet, nomEvenement } from '../lib/acquisition.js'
 import { nomsObjet } from '../lib/localisation.js'
 import useProgression from '../hooks/useProgression.jsx'
 
@@ -74,7 +74,7 @@ function nomsDesObjets(ids) {
 export function AlerteAcquisition({ alerte, nomZone = null }) {
   const { etat } = useProgression()
   const [revele, setRevele] = useState(false)
-  const { condition, evaluation, objets, roles = [] } = alerte
+  const { condition, evaluation, objets, roles = [], action = null } = alerte
   const detailParDefaut = etat.acquisition?.spoilers === 'detail'
   const detailVisible = revele || detailParDefaut
   const masquerObjets = condition.masquerObjets && !detailVisible
@@ -95,11 +95,19 @@ export function AlerteAcquisition({ alerte, nomZone = null }) {
 
       <p className="mt-2 text-gray-100">{condition.libelleDiscret}</p>
       <p className="mt-1 text-xs text-gray-400">{condition.discret}</p>
+      {action && (
+        <p className="mt-2 text-xs text-or-100">
+          <span className="glyphe">À faire ici</span> {action}
+        </p>
+      )}
 
       {evaluation.resultat === 'non-satisfait' && (
         <p className="mt-2 text-xs text-red-200">
-          Condition devenue impossible d’après votre déclaration ({evenementDe(condition.evenement)?.nom}). Aucun objet
-          obtenu ne la satisfait. Annulez la déclaration si elle est erronée.
+          Condition devenue impossible d’après votre déclaration (
+          {evaluation.methodes.length > 0
+            ? 'toutes les méthodes sont fermées'
+            : evaluation.fermeturesDeclarees.map(nomEvenement).join(' + ')}
+          ). Aucun objet obtenu ne la satisfait. Annulez la déclaration si elle est erronée.
         </p>
       )}
       {evaluation.resultat === 'satisfait' && (
@@ -143,11 +151,20 @@ export function AlerteAcquisition({ alerte, nomZone = null }) {
       {detailVisible && (
         <div id={idDetail} className="mt-2 space-y-2 text-xs text-gray-300">
           <p>{condition.detail}</p>
+          {evaluation.methodes.length > 0 && <MethodesAlerte methodes={evaluation.methodes} />}
+          {evaluation.etapes.length > 0 && <EtapesAlerte evaluation={evaluation} />}
           {condition.voies.length > 0 && (
             <VoiesAlerte condition={condition} />
           )}
+          <ListeTexte titre="Pas requis" lignes={condition.nonExigences} />
+          <ListeTexte titre="Faits inconnus" lignes={condition.inconnus} />
           <p className="text-gray-400">
             {CONFIANCES[condition.confiance]}.{' '}
+            {condition.preuves?.length > 0 && (
+              <span className="mr-2">
+                Preuves de l’audit : {condition.preuves.map((preuve) => `${preuve.page.replaceAll('_', ' ')} (rév. ${preuve.rev})`).join(', ')}.
+              </span>
+            )}
             {condition.sources.map((source, index) => (
               <span key={index} className="mr-2">
                 {source.url ? <LienExterne href={source.url}>{source.libelle}</LienExterne> : source.libelle}
@@ -161,6 +178,62 @@ export function AlerteAcquisition({ alerte, nomZone = null }) {
         <EtatsAlerte condition={condition} evaluation={evaluation} />
       </div>
     </li>
+  )
+}
+
+function ListeTexte({ titre, lignes }) {
+  if (!lignes?.length) return null
+  return (
+    <div>
+      <p className="glyphe">{titre}</p>
+      <ul className="mt-1 list-disc space-y-0.5 pl-5 text-gray-400">
+        {lignes.map((ligne) => (
+          <li key={ligne}>{ligne}</li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+/** Méthodes alternatives (une suffit) : l'état de chacune, jamais « tout est fermé » par une seule. */
+function MethodesAlerte({ methodes }) {
+  return (
+    <div>
+      <p className="glyphe">Méthodes (une suffit)</p>
+      <ul className="mt-1 space-y-0.5">
+        {methodes.map((methode) => (
+          <li key={methode.id} className={methode.ouverte ? 'text-gray-300' : 'text-red-200'}>
+            {methode.ouverte ? 'Ouverte' : 'Fermée'} · {methode.libelle}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+/** Jalons déclarés : ils situent la progression, ils ne lèvent jamais l'alerte. */
+function EtapesAlerte({ evaluation }) {
+  const { declarerEvenement } = useProgression()
+  return (
+    <div>
+      <p className="glyphe">Jalons (ne lèvent pas l’alerte)</p>
+      <ul className="mt-1 space-y-1">
+        {evaluation.etapes.map((etape) => (
+          <li key={etape.id}>
+            <button
+              type="button"
+              className="bouton min-h-[44px]"
+              aria-pressed={etape.faite}
+              onClick={() => declarerEvenement(etape.id, !etape.faite)}
+            >
+              {etape.faite ? '✓ ' : ''}
+              {etape.libelle}
+            </button>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-1 text-gray-400">Prochaine étape : {evaluation.prochaineEtape.libelle}.</p>
+    </div>
   )
 }
 

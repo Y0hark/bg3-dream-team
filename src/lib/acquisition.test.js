@@ -13,6 +13,7 @@ import {
   alertesObjet,
   badgesObjet,
   evaluerCondition,
+  fermeturesDe,
   niveauAudit,
   objetsDuPlan,
   recapZone,
@@ -37,6 +38,10 @@ describe('conditions — intégrité des données', () => {
       if (condition.zone) expect(LIEUX.some((lieu) => lieu.id === condition.zone), condition.id).toBe(true)
       if (condition.evenement) expect(evenements.has(condition.evenement), condition.id).toBe(true)
       for (const voie of condition.voies) expect(evenements.has(voie.id), voie.id).toBe(true)
+      const fermetures = [...(condition.fermetures ?? []), ...(condition.methodes ?? []).flatMap((m) => m.fermetures ?? [])]
+      for (const id of fermetures.flat()) expect(evenements.has(id), `${condition.id} → ${id}`).toBe(true)
+      for (const etape of condition.etapes ?? []) expect(evenements.has(etape.id), `${condition.id} → ${etape.id}`).toBe(true)
+      for (const zone of condition.zonesAlerte ?? []) expect(LIEUX.some((lieu) => lieu.id === zone), `${condition.id} → ${zone}`).toBe(true)
     }
     for (const evenement of EVENEMENTS) {
       expect(LIEUX.some((lieu) => lieu.id === evenement.zone), evenement.id).toBe(true)
@@ -51,8 +56,10 @@ describe('conditions — intégrité des données', () => {
       if (condition.irreversible) {
         // Pas d'irréversible inventé : source recoupée ou fiche, jamais « à vérifier ».
         expect(condition.confiance, condition.id).not.toBe('a-verifier')
-        expect(condition.evenement, condition.id).not.toBeNull()
+        // Une fermeture déclarable existe : événement, fermetures ou méthodes.
+        expect(fermeturesDe(condition).length + (condition.methodes?.length ?? 0), condition.id).toBeGreaterThan(0)
       }
+      if (condition.confiance === 'verifie') expect(condition.preuves?.length, condition.id).toBeGreaterThan(0)
     }
   })
 
@@ -90,12 +97,11 @@ describe('évaluation — trois résultats, jamais de feu vert par défaut', () 
     expect(evaluerCondition(condition, declare).resultat).toBe('inconnu')
   })
 
-  it('plusieurs voies : une seule suffit (logique alternative)', () => {
+  it('rencontrer le bœuf vivant n’est qu’un jalon, jamais une voie satisfaisante', () => {
     const condition = conditionDe('chapeau-acuite-boeuf')
     expect(evaluerCondition(condition, etat()).resultat).toBe('inconnu')
     const resultat = evaluerCondition(condition, avec({ evenements: { 'boeuf-vu-rivington': true } }))
-    expect(resultat).toMatchObject({ resultat: 'satisfait', raison: 'voie' })
-    expect(evaluerCondition(condition, avec({ evenements: { 'boeuf-vu-ultime-lueur': true } })).resultat).toBe('satisfait')
+    expect(resultat.resultat).toBe('inconnu')
   })
 
   it('départ irréversible déclaré sans l’objet : non satisfait ; l’original obtenu prime', () => {
@@ -225,7 +231,7 @@ describe('persistance — additive, sans perte', () => {
     const ancien = { schema: 2, composition: etatInitial().composition, items: { nyrulna: 'obtenu' }, checklist: { x: true } }
     const normalise = normaliserEtat(ancien)
     expect(normalise.items).toEqual({ nyrulna: 'obtenu' })
-    expect(normalise.acquisition).toEqual({ evenements: {}, statuts: {}, spoilers: 'discret' })
+    expect(normalise.acquisition).toEqual({ evenements: {}, statuts: {}, spoilers: 'discret', version: 2 })
   })
 
   it('écarte les clés inconnues et corrompues, garde les valides', () => {
@@ -238,6 +244,7 @@ describe('persistance — additive, sans perte', () => {
       evenements: { 'roah-tuee': true },
       statuts: { 'kushigo-plan-astral': 'ignore' },
       spoilers: 'detail',
+      version: 2,
     })
     expect(normaliserAcquisition('n’importe quoi')).toEqual(etatInitial().acquisition)
   })
@@ -341,7 +348,7 @@ describe('interface — spoilers, clavier, mobile', () => {
   it('le badge d’objet reste court et nomme l’incertitude', () => {
     const html = rendre(createElement(BadgesAcquisition, { objetId: 'chapeau-inexistant' }))
     expect(html).toBe('')
-    const badges = badgesObjet('hat-of-fire-acuity', etat())
+    const badges = badgesObjet('ring-arcane-synergy', etat())
     expect(badges[0].libelle).toBe('À vérifier sur votre version')
     const court = rendre(createElement(BadgesAcquisition, { objetId: 'boots-uninhibited-kushigo' }))
     expect(court).toContain('Avant départ')
