@@ -8,15 +8,21 @@
 // - evenements : faits déclarés (EVENEMENTS) ;
 // - statuts : décision par alerte — 'fait' | 'ignore' ; l'absence vaut
 //   « à vérifier » (jamais un feu vert par défaut) ;
-// - spoilers : 'discret' (défaut) ou 'detail'.
+// - spoilers : 'discret' (défaut) ou 'detail' ;
+// - version : forme du suivi. Absente (suivis d'avant le Follow-up 3/4, locaux ou
+//   cloud) : les « fait » posés sur une condition dont le sens a changé
+//   (CONDITIONS_REDEFINIES) sont écartés — un ancien jalon n'est pas une preuve
+//   pour la nouvelle définition. « ignorée » et les événements déclarés restent
+//   (les ids n'ont pas changé de sens : « bœuf vu » reste un jalon).
 // ------------------------------------------------------------------
-import { CONDITIONS, EVENEMENTS } from '../data/acquisition.js'
+import { CONDITIONS, CONDITIONS_REDEFINIES, EVENEMENTS } from '../data/acquisition.js'
 
 export const STATUTS_ALERTE = ['fait', 'ignore']
 export const MODES_SPOILERS = ['discret', 'detail']
+export const VERSION_ACQUISITION = 2
 
 export function acquisitionInitiale() {
-  return { evenements: {}, statuts: {}, spoilers: 'discret' }
+  return { evenements: {}, statuts: {}, spoilers: 'discret', version: VERSION_ACQUISITION }
 }
 
 const estObjet = (valeur) => valeur && typeof valeur === 'object' && !Array.isArray(valeur)
@@ -36,7 +42,9 @@ export function normaliserAcquisition(brut) {
   }
   if (estObjet(brut.statuts)) {
     for (const [id, statut] of Object.entries(brut.statuts)) {
-      if (STATUTS_ALERTE.includes(statut) && conditions.has(id)) acquisition.statuts[id] = statut
+      if (!STATUTS_ALERTE.includes(statut) || !conditions.has(id)) continue
+      if (statut === 'fait' && brut.version !== VERSION_ACQUISITION && CONDITIONS_REDEFINIES.includes(id)) continue
+      acquisition.statuts[id] = statut
     }
   }
   if (MODES_SPOILERS.includes(brut.spoilers)) acquisition.spoilers = brut.spoilers

@@ -32,23 +32,68 @@ export const LIBELLE_A_VERIFIER = 'À vérifier sur votre version'
 
 const ordreSeverite = (condition) => SEVERITES[condition.severite]?.ordre ?? 9
 
-/** Évalue une condition pour un lot d'objets concernés (par défaut tous les siens). */
+const declare = (acquisition, id) => Boolean(acquisition.evenements[id])
+// Un élément est un id (OU) ou un tableau d'ids (ET : tous doivent être déclarés).
+const fermee = (acquisition, element) =>
+  Array.isArray(element) ? element.every((id) => declare(acquisition, id)) : declare(acquisition, element)
+const idsDe = (element) => (Array.isArray(element) ? element : [element])
+
+/** Événements qui ferment la condition ; `evenement` seul garde son rôle historique. */
+export function fermeturesDe(condition) {
+  if (condition.fermetures) return condition.fermetures
+  return condition.irreversible && condition.evenement ? [condition.evenement] : []
+}
+
+/**
+ * Évalue une condition pour un lot d'objets concernés (par défaut tous les siens).
+ *
+ * Étapes et méthodes sont de l'information : seules l'obtention de l'original,
+ * une voie, « fait », ou la fermeture déclarée de TOUTES les méthodes changent
+ * le résultat. Une méthode fermée n'éteint jamais une méthode encore ouverte.
+ */
 export function evaluerCondition(condition, etat, objets = condition.objets) {
   const acquisition = normaliserAcquisition(etat?.acquisition)
   const statutUtilisateur = acquisition.statuts[condition.id] ?? null
   const ignoree = statutUtilisateur === 'ignore'
   const concernes = objets.length > 0 ? objets : condition.objets
 
-  const resultat = (valeur, raison) => ({ resultat: valeur, raison, ignoree, statutUtilisateur })
+  const methodes = (condition.methodes ?? []).map((methode) => ({
+    id: methode.id,
+    libelle: methode.libelle,
+    ouverte: !(methode.fermetures ?? []).some((element) => fermee(acquisition, element)),
+  }))
+  const etapes = (condition.etapes ?? []).map((etape) => ({ ...etape, faite: declare(acquisition, etape.id) }))
+  const suivante = etapes.find((etape) => !etape.faite)
+  const prochaineEtape = etapes.length === 0 ? null : (suivante ?? { id: null, libelle: condition.finale ?? 'Obtenir l’original' })
+  const fermeturesDeclarees = (condition.methodes ? [] : fermeturesDe(condition))
+    .filter((element) => fermee(acquisition, element))
+    .flatMap(idsDe)
+
+  const resultat = (valeur, raison) => ({
+    resultat: valeur,
+    raison,
+    ignoree,
+    statutUtilisateur,
+    methodes,
+    etapes,
+    prochaineEtape,
+    fermeturesDeclarees,
+  })
 
   if (concernes.every((id) => estResolu(statutDe(etat, id)))) return resultat('satisfait', 'original')
   const voie = condition.voies.find((entree) => acquisition.evenements[entree.id])
   if (voie) return resultat('satisfait', 'voie')
   if (statutUtilisateur === 'fait') return resultat('satisfait', 'declare')
-  if (condition.irreversible && condition.evenement && acquisition.evenements[condition.evenement]) {
-    return resultat('non-satisfait', 'ferme')
+  if (condition.irreversible) {
+    const toutesFermees = methodes.length > 0 ? methodes.every((methode) => !methode.ouverte) : fermeturesDeclarees.length > 0
+    if (toutesFermees) return resultat('non-satisfait', 'ferme')
   }
   return resultat('inconnu', 'inconnu')
+}
+
+/** Geste concret de préservation propre à une zone (repli : `action`). */
+export function actionPourZone(condition, zoneId) {
+  return condition.actions?.[zoneId] ?? condition.action ?? null
 }
 
 /** Objets du plan : références des rôles + alternatives choisies (+ toutes les options si demandé). */
@@ -135,7 +180,7 @@ export function recapZone(zoneId, etat, { roles = null, alternatives = false } =
 
   const candidates = CONDITIONS.filter((condition) => {
     if (concernes(condition).length === 0) return false
-    if (condition.zone === zoneId) return true
+    if (condition.zone === zoneId || condition.zonesAlerte?.includes(zoneId)) return true
     return condition.objets.some((id) => lieuxDeObjet(objetDe(id)).includes(zoneId))
   })
 
@@ -147,6 +192,7 @@ export function recapZone(zoneId, etat, { roles = null, alternatives = false } =
         objets,
         roles: [...new Set(objets.flatMap((id) => rolesRecommandant(id)))].filter((role) => !roles || roles.includes(role)),
         evaluation: evaluerCondition(condition, etat, objets),
+        action: actionPourZone(condition, zoneId),
       }
     })
     .sort((a, b) => ordreSeverite(a.condition) - ordreSeverite(b.condition))
