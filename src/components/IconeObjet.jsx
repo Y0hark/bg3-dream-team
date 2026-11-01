@@ -23,6 +23,7 @@ export default function IconeObjet({ objet, taille = 40 }) {
           alt=""
           width={taille}
           height={taille}
+          className="h-full w-full object-contain"
           loading="lazy"
           decoding="async"
           onError={() => setEchec(true)}

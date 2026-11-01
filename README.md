@@ -315,3 +315,7 @@ Il n'y a pas de test navigateur automatisé dans le dépôt : les parcours à la
 clavier (Échap, retour du focus) et le débordement horizontal à 360 px ont été vérifiés à
 la main sur `vite dev` ; le tactile réel, le contraste mesuré et un lecteur d'écran n'ont
 pas été vérifiés.
+
+## Icônes d'objets
+
+Les icônes (`public/icones/`) viennent du BG3 Wiki et sont servies localement ; le site ne contacte jamais le wiki. Elles sont collectées à la préparation par `node scripts/collecter-icones.mjs` (1 requête/s, cache par sha1), qui réécrit `src/data/icones-wiki.json` (ID → fichier → page objet → page fichier → sha1). Ce sont des assets de Larian Studios, pas une licence libre : voir `ICONES` dans `src/data/objets-meta.js`.
